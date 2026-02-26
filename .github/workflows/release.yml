@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate marketplace.json
+        run: |
+          # Basic validation that marketplace.json exists and is valid JSON
+          python3 -c "import json; json.load(open('marketplace.json'))"
+          echo "✅ marketplace.json is valid JSON"
+
+      - name: Validate Skills
+        run: |
+          # Check that all referenced skills exist
+          python3 << 'EOF'
+          import json
+          import os
+
+          with open('marketplace.json') as f:
+              data = json.load(f)
+
+          for plugin in data.get('plugins', []):
+              for skill in plugin.get('skills', []):
+                  skill_path = skill.replace('./', '')
+                  skill_md = os.path.join(skill_path, 'SKILL.md')
+                  if not os.path.exists(skill_md):
+                      print(f"❌ Missing: {skill_md}")
+                      exit(1)
+                  print(f"✅ Found: {skill_md}")
+
+          print("\n✅ All skills validated successfully!")
+          EOF
+
+      - name: Create Release Package
+        run: |
+          # Create a clean package without unnecessary files
+          mkdir -p release
+          cp -r skills marketplace.json README.md LICENSE CHANGELOG.md CONTRIBUTING.md release/
+          cd release
+          zip -r ../claude-usage-analysis-plugin-${{ github.ref_name }}.zip .
+          cd ..
+
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          # Extract changelog for this version
+          VERSION=${{ github.ref_name }}
+          echo "Extracting changelog for $VERSION"
+          CHANGELOG=$(awk "/^## \\[$VERSION\\]/ {found=1} found && /^## \\[/ && NR>1 {exit} found" CHANGELOG.md || echo "See CHANGELOG.md for details")
+          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: ${{ steps.changelog.outputs.CHANGELOG }}
+          files: |
+            claude-usage-analysis-plugin-${{ github.ref_name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  notify:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release Summary
+        run: |
+          echo "🎉 Release ${{ github.ref_name }} created successfully!"
+          echo ""
+          echo "Installation:"
+          echo "  claude plugin add https://github.com/${{ github.repository }}"

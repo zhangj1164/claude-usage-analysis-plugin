@@ -1,0 +1,158 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate marketplace.json
+        run: |
+          python3 -c "import json; json.load(open('marketplace.json'))"
+          echo "✅ marketplace.json is valid JSON"
+
+      - name: Validate Skills Structure
+        run: |
+          python3 << 'EOF'
+          import json
+          import os
+          import re
+
+          errors = []
+          warnings = []
+
+          with open('marketplace.json') as f:
+              data = json.load(f)
+
+          # Validate marketplace.json structure
+          if 'name' not in data:
+              errors.append("marketplace.json: missing 'name'")
+          if 'plugins' not in data:
+              errors.append("marketplace.json: missing 'plugins'")
+
+          # Validate each plugin
+          for plugin in data.get('plugins', []):
+              if 'name' not in plugin:
+                  errors.append("Plugin missing 'name'")
+              if 'skills' not in plugin:
+                  errors.append(f"Plugin {plugin.get('name', 'unknown')}: missing 'skills'")
+                  continue
+
+              # Validate each skill
+              for skill in plugin.get('skills', []):
+                  skill_path = skill.replace('./', '')
+                  skill_md = os.path.join(skill_path, 'SKILL.md')
+
+                  if not os.path.exists(skill_md):
+                      errors.append(f"Missing SKILL.md: {skill_md}")
+                      continue
+
+                  # Validate SKILL.md content
+                  with open(skill_md) as f:
+                      content = f.read()
+
+                  # Check for frontmatter
+                  if not content.startswith('---'):
+                      errors.append(f"{skill_md}: missing frontmatter")
+                      continue
+
+                  # Extract frontmatter
+                  match = re.match(r'^---\s*\n(.*?)\n---\s*\n', content, re.DOTALL)
+                  if not match:
+                      errors.append(f"{skill_md}: invalid frontmatter format")
+                      continue
+
+                  try:
+                      import yaml
+                      frontmatter = yaml.safe_load(match.group(1))
+                  except:
+                      # If yaml not available, do basic check
+                      if 'name:' not in content.split('---')[1]:
+                          errors.append(f"{skill_md}: missing 'name' in frontmatter")
+                      if 'description:' not in content.split('---')[1]:
+                          errors.append(f"{skill_md}: missing 'description' in frontmatter")
+                      continue
+
+                  if not frontmatter.get('name'):
+                      errors.append(f"{skill_md}: empty or missing 'name'")
+                  if not frontmatter.get('description'):
+                      errors.append(f"{skill_md}: empty or missing 'description'")
+
+                  # Check for LICENSE
+                  license_file = os.path.join(skill_path, 'LICENSE.txt')
+                  license_alt = os.path.join(skill_path, 'LICENSE')
+                  if not os.path.exists(license_file) and not os.path.exists(license_alt):
+                      warnings.append(f"{skill_path}: missing LICENSE file")
+
+          # Print results
+          if warnings:
+              print("\n⚠️  Warnings:")
+              for w in warnings:
+                  print(f"  - {w}")
+
+          if errors:
+              print("\n❌ Errors:")
+              for e in errors:
+                  print(f"  - {e}")
+              exit(1)
+
+          print("\n✅ All validations passed!")
+          EOF
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Lint Python Scripts
+        run: |
+          pip install flake8
+          find skills -name "*.py" -exec flake8 {} \; || true
+          echo "✅ Python linting completed"
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Documentation
+        run: |
+          # Check that README exists and has required sections
+          if [ ! -f README.md ]; then
+            echo "❌ README.md is missing"
+            exit 1
+          fi
+
+          required_sections=("Installation" "Usage" "License")
+          for section in "${required_sections[@]}"; do
+            if ! grep -q "$section" README.md; then
+              echo "⚠️  README.md might be missing '$section' section"
+            fi
+          done
+
+          # Check that CHANGELOG exists
+          if [ ! -f CHANGELOG.md ]; then
+            echo "⚠️  CHANGELOG.md is missing"
+          fi
+
+          # Check that LICENSE exists
+          if [ ! -f LICENSE ]; then
+            echo "❌ LICENSE is missing"
+            exit 1
+          fi
+
+          echo "✅ Documentation check completed"
