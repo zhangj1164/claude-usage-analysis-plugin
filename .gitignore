@@ -43,5 +43,6 @@ test-data/
 tmp/
 temp/
 
-# Claude specific
-.claude/
+# Claude specific - user data (keep examples)
+.claude/*
+!.claude/CLAUDE.md

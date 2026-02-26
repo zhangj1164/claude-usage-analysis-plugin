@@ -18,7 +18,9 @@
 #### 方式 1：从 GitHub 安装（推荐）
 
 ```bash
-claude plugin add https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
+# 或简写
+claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
 ```
 
 #### 方式 2：从本地目录安装
@@ -31,7 +33,7 @@ cd claude-usage-analysis-plugin
 
 2. 安装插件：
 ```bash
-claude plugin add .
+claude plugin install .
 ```
 
 #### 方式 3：从 Release 包安装
@@ -40,7 +42,7 @@ claude plugin add .
 2. 解压到本地目录
 3. 安装：
 ```bash
-claude plugin add /path/to/claude-usage-analysis-plugin
+claude plugin install /path/to/claude-usage-analysis-plugin
 ```
 
 ### 配置步骤
@@ -182,7 +184,9 @@ claude plugin update claude-usage-analysis-plugin
 
 # 或重新安装
 claude plugin remove claude-usage-analysis-plugin
-claude plugin add https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
+# 或简写
+claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
 ```
 
 ### 卸载
@@ -207,7 +211,9 @@ claude plugin remove claude-usage-analysis-plugin
 #### Option 1: Install from GitHub (Recommended)
 
 ```bash
-claude plugin add https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
+# 或简写
+claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
 ```
 
 #### Option 2: Install from Local Directory
@@ -220,7 +226,7 @@ cd claude-usage-analysis-plugin
 
 2. Install the plugin:
 ```bash
-claude plugin add .
+claude plugin install .
 ```
 
 #### Option 3: Install from Release Package
@@ -229,7 +235,7 @@ claude plugin add .
 2. Extract to a local directory
 3. Install:
 ```bash
-claude plugin add /path/to/claude-usage-analysis-plugin
+claude plugin install /path/to/claude-usage-analysis-plugin
 ```
 
 ### Configuration
@@ -367,7 +373,9 @@ claude plugin update claude-usage-analysis-plugin
 
 # Or reinstall
 claude plugin remove claude-usage-analysis-plugin
-claude plugin add https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
+# 或简写
+claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
 ```
 
 ### Uninstall

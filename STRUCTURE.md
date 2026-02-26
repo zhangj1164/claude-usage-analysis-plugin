@@ -188,10 +188,10 @@ After publishing to GitHub, users can install via:
 
 ```bash
 # Git URL
-claude plugin add https://github.com/username/claude-usage-analysis-plugin
+claude plugin install https://github.com/username/claude-usage-analysis-plugin
 
 # Specific version
-claude plugin add https://github.com/username/claude-usage-analysis-plugin@v1.0.0
+claude plugin install https://github.com/username/claude-usage-analysis-plugin@v1.0.0
 ```
 
 ## Development
@@ -204,7 +204,7 @@ git clone https://github.com/username/claude-usage-analysis-plugin.git
 cd claude-usage-analysis-plugin
 
 # Install locally
-claude plugin add .
+claude plugin install .
 
 # Test changes
 claude plugin update claude-usage-analysis-plugin

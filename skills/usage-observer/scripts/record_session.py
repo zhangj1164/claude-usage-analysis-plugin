@@ -189,7 +189,7 @@ def generate_markdown_content(date, records, stats, args=None):
         "",
         "---",
         "",
-        "*本文件由 claude-session-auto-tracker 自动生成*",
+        "*本文件由 claude-usage-analysis-plugin 自动生成*",
     ])
 
     if args and getattr(args, 'auto_triggered', False):

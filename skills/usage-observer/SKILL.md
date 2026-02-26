@@ -235,7 +235,7 @@ skill:usage-recorder
 
 ## 自动采集标记
 
-- 本条记录由 claude-session-auto-tracker 自动采集
+- 本条记录由 claude-usage-analysis-plugin 自动采集
 - 触发关键词: "错误"
 - 原始提问: "[用户原始提问内容]"
 ```

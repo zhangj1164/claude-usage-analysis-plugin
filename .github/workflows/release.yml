@@ -81,4 +81,4 @@ jobs:
           echo "🎉 Release ${{ github.ref_name }} created successfully!"
           echo ""
           echo "Installation:"
-          echo "  claude plugin add https://github.com/${{ github.repository }}"
+          echo "  claude plugin install https://github.com/${{ github.repository }}"

@@ -126,7 +126,7 @@ Each skill should have:
 
 ```bash
 # Install locally
-claude plugin add C:\Users\zjlzld\Documents\trae_projects\plugins\claude-usage-analysis-plugin
+claude plugin install C:\Users\zjlzld\Documents\trae_projects\plugins\claude-usage-analysis-plugin
 
 # Verify installation
 claude plugin list
@@ -167,10 +167,10 @@ After publishing, users can install with:
 
 ```bash
 # Install from GitHub
-claude plugin add https://github.com/YOUR_USERNAME/claude-usage-analysis-plugin
+claude plugin install https://github.com/YOUR_USERNAME/claude-usage-analysis-plugin
 
 # Or specific version
-claude plugin add https://github.com/YOUR_USERNAME/claude-usage-analysis-plugin@v1.0.0
+claude plugin install https://github.com/YOUR_USERNAME/claude-usage-analysis-plugin@v1.0.0
 ```
 
 Then configure Hook in `~/.claude/config.json`:

@@ -25,10 +25,19 @@ Claude 使用分析系统 - 帮助团队自动采集、分析使用数据，持�
 
 ### 📦 安装
 
-#### 方式 1: 通过 Git URL 安装
+#### 方式 1: 通过 Git URL 安装（推荐）
 
 ```bash
-claude plugin add https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
+# 或简写
+claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
+```
+
+或安装特定版本：
+```bash
+claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
+# 或简写
+claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin@v1.0.0
 ```
 
 #### 方式 2: 手动安装
@@ -40,8 +49,20 @@ git clone https://github.com/zhangj1164/claude-usage-analysis-plugin.git
 
 2. 在 Claude Code 中添加本地插件：
 ```bash
-claude plugin add ./claude-usage-analysis-plugin
+claude plugin install ./claude-usage-analysis-plugin
 ```
+
+#### 方式 3: 通过项目配置自动安装
+
+在项目的 `.claude/CLAUDE.md` 或用户目录 `~/.claude/CLAUDE.md` 中添加：
+
+```markdown
+## Plugins
+
+- https://github.com/zhangj1164/claude-usage-analysis-plugin
+```
+
+然后在项目目录运行 `claude` 命令时，插件会自动加载。
 
 ### ⚙️ 配置
 
@@ -211,10 +232,19 @@ This is a complete Claude Code usage analytics system with four roles working to
 
 ### 📦 Installation
 
-#### Option 1: Install via Git URL
+#### Option 1: Install via Git URL (Recommended)
 
 ```bash
-claude plugin add https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
+# 或简写
+claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
+```
+
+Or install a specific version:
+```bash
+claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
+# 或简写
+claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin@v1.0.0
 ```
 
 #### Option 2: Manual Installation
@@ -226,8 +256,20 @@ git clone https://github.com/zhangj1164/claude-usage-analysis-plugin.git
 
 2. Add the local plugin in Claude Code:
 ```bash
-claude plugin add ./claude-usage-analysis-plugin
+claude plugin install ./claude-usage-analysis-plugin
 ```
+
+#### Option 3: Auto-install via Project Configuration
+
+Add to your project's `.claude/CLAUDE.md` or user directory `~/.claude/CLAUDE.md`:
+
+```markdown
+## Plugins
+
+- https://github.com/zhangj1164/claude-usage-analysis-plugin
+```
+
+The plugin will auto-load when you run `claude` in the project directory.
 
 ### ⚙️ Configuration
 
