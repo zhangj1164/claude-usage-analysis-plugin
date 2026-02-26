@@ -192,6 +192,38 @@ python scripts/analyze_usage.py --period month --user team --type detailed
 python scripts/analyze_usage.py --period week --format json --output stats.json
 ```
 
+### md_to_html.py - Markdown 转 HTML
+
+将 Markdown 格式的分析报告转换为美观的 HTML 文件，方便在浏览器中查看。
+
+**参数：**
+- `-i`, `--input`: 输入 Markdown 文件路径
+- `-o`, `--output`: 输出 HTML 文件路径（可选，默认同目录同名 .html）
+- `-d`, `--directory`: 批量转换目录中的所有 Markdown 文件
+- `--batch`: 批量转换默认数据目录中的所有报告
+
+**示例：**
+```bash
+# 转换单个报告
+python scripts/md_to_html.py -i report.md
+python scripts/md_to_html.py -i report.md -o report.html
+
+# 批量转换目录
+python scripts/md_to_html.py -d ./reports
+python scripts/md_to_html.py -d ./reports -o ./html_output
+
+# 转换所有分析数据（默认目录）
+python scripts/md_to_html.py --batch
+```
+
+**HTML 特性：**
+- 响应式设计，适配桌面和移动设备
+- 美观的卡片式布局
+- 表格样式优化，支持悬停效果
+- 代码高亮显示
+- 打印友好
+- 自动生成的页眉和页脚
+
 ## 核心指标
 
 ### 基础指标
@@ -264,6 +296,13 @@ usage-coach（教练）
 建议：
 1. 针对高频工具错误创建检查清单
 2. 预留更多时间处理调试类问题
+
+💡 **生成 HTML 报告查看：**
+```bash
+python skills/usage-analyst/scripts/md_to_html.py -i weekly_report.md
+# 生成: weekly_report.html
+# 用浏览器打开查看美观的报告
+```
 ```
 
 ### 示例 2: 团队月分析
@@ -307,8 +346,51 @@ usage-coach（教练）
 ## 依赖
 
 - Python 3.7+
-- pandas（数据处理）
+- pandas（数据处理，可选）
 - matplotlib（图表生成，可选）
+
+## HTML 报告生成
+
+### 使用场景
+
+生成的 HTML 报告适合：
+- 在浏览器中查看，界面美观
+- 分享给团队成员
+- 打印或导出为 PDF
+- 存档和演示
+
+### 生成步骤
+
+1. 先生成 Markdown 分析报告（使用 analyze_usage.py 或让 Claude 生成）
+2. 使用 md_to_html.py 转换为 HTML
+3. 用浏览器打开 HTML 文件
+
+### 完整示例
+
+```bash
+# 1. 分析本周数据并生成报告
+python scripts/analyze_usage.py --period week --user personal -o weekly_report.md
+
+# 2. 转换为 HTML
+python scripts/md_to_html.py -i weekly_report.md -o weekly_report.html
+
+# 3. 在浏览器中打开
+# Windows
+start weekly_report.html
+# Mac
+open weekly_report.html
+# Linux
+xdg-open weekly_report.html
+```
+
+### 批量转换所有报告
+
+```bash
+# 转换数据目录中的所有 Markdown 文件
+python skills/usage-analyst/scripts/md_to_html.py --batch
+
+# HTML 文件将生成在 ~/.claude/claude-analysis/html/
+```
 
 ## 存储位置
 
