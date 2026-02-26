@@ -17,10 +17,16 @@
 
 #### 方式 1：从 GitHub 安装（推荐）
 
+**步骤 1**：添加 Marketplace 源
 ```bash
-claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin marketplace add https://github.com/zhangj1164/claude-usage-analysis-plugin
+```
+
+**步骤 2**：安装插件（插件名为 `usage-analytics`）
+```bash
+claude plugin install usage-analytics
 # 或简写
-claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin i usage-analytics
 ```
 
 #### 方式 2：从本地目录安装
@@ -31,18 +37,20 @@ git clone https://github.com/zhangj1164/claude-usage-analysis-plugin.git
 cd claude-usage-analysis-plugin
 ```
 
-2. 安装插件：
+2. 添加本地 Marketplace 并安装：
 ```bash
-claude plugin install .
+claude plugin marketplace add .
+claude plugin install usage-analytics
 ```
 
 #### 方式 3：从 Release 包安装
 
 1. 从 [Releases](../../releases) 页面下载最新版本
 2. 解压到本地目录
-3. 安装：
+3. 添加 Marketplace 并安装：
 ```bash
-claude plugin install /path/to/claude-usage-analysis-plugin
+claude plugin marketplace add /path/to/claude-usage-analysis-plugin
+claude plugin install usage-analytics
 ```
 
 ### 配置步骤
@@ -192,7 +200,9 @@ claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
 ### 卸载
 
 ```bash
-claude plugin remove claude-usage-analysis-plugin
+claude plugin uninstall usage-analytics
+# 或
+claude plugin remove usage-analytics
 ```
 
 ---
@@ -210,10 +220,16 @@ claude plugin remove claude-usage-analysis-plugin
 
 #### Option 1: Install from GitHub (Recommended)
 
+**Step 1**: Add the marketplace source
 ```bash
-claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
-# 或简写
-claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin marketplace add https://github.com/zhangj1164/claude-usage-analysis-plugin
+```
+
+**Step 2**: Install the plugin (plugin name is `usage-analytics`)
+```bash
+claude plugin install usage-analytics
+# or shorthand
+claude plugin i usage-analytics
 ```
 
 #### Option 2: Install from Local Directory
@@ -224,18 +240,20 @@ git clone https://github.com/zhangj1164/claude-usage-analysis-plugin.git
 cd claude-usage-analysis-plugin
 ```
 
-2. Install the plugin:
+2. Add local marketplace and install:
 ```bash
-claude plugin install .
+claude plugin marketplace add .
+claude plugin install usage-analytics
 ```
 
 #### Option 3: Install from Release Package
 
 1. Download the latest release from [Releases](../../releases)
 2. Extract to a local directory
-3. Install:
+3. Add marketplace and install:
 ```bash
-claude plugin install /path/to/claude-usage-analysis-plugin
+claude plugin marketplace add /path/to/claude-usage-analysis-plugin
+claude plugin install usage-analytics
 ```
 
 ### Configuration
@@ -381,7 +399,9 @@ claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
 ### Uninstall
 
 ```bash
-claude plugin remove claude-usage-analysis-plugin
+claude plugin uninstall usage-analytics
+# 或
+claude plugin remove usage-analytics
 ```
 
 ---

@@ -4,16 +4,16 @@
 
 ### 方法 1: 通过 Claude Code CLI 安装（推荐）
 
+**步骤 1**: 添加 Marketplace 源
 ```bash
-# 从 GitHub 安装最新版本
-claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
-# 或简写
-claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin marketplace add https://github.com/zhangj1164/claude-usage-analysis-plugin
+```
 
-# 或安装特定版本
-claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
+**步骤 2**: 安装插件（插件名为 `usage-analytics`）
+```bash
+claude plugin install usage-analytics
 # 或简写
-claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin@v1.0.0
+claude plugin i usage-analytics
 ```
 
 ### 方法 2: 本地安装
@@ -22,19 +22,10 @@ claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin@v1.0.
 # 1. 克隆仓库
 git clone https://github.com/zhangj1164/claude-usage-analysis-plugin.git
 
-# 2. 进入目录并安装
+# 2. 进入目录，添加本地 marketplace 并安装
 cd claude-usage-analysis-plugin
-claude plugin install .
-```
-
-### 方法 3: 通过设置文件配置
-
-在项目的 `.claude/CLAUDE.md` 或用户目录的 `~/.claude/CLAUDE.md` 中添加：
-
-```markdown
-## Plugins
-
-- https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin marketplace add .
+claude plugin install usage-analytics
 ```
 
 ## 使用说明
@@ -48,14 +39,17 @@ claude plugin install .
 ## 验证安装
 
 ```bash
-# 查看已安装的插件
-claude plugin list
+# 查看已配置的 marketplace
+claude plugin marketplace list
 
-# 应该能看到 claude-usage-analysis-plugin 及其 skills
+# 查看已安装的插件
+cat ~/.claude/plugins/installed_plugins.json
 ```
 
 ## 卸载
 
 ```bash
-claude plugin remove claude-usage-analysis-plugin
+claude plugin uninstall usage-analytics
+# 或
+claude plugin remove usage-analytics
 ```

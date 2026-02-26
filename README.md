@@ -27,29 +27,29 @@ Claude 使用分析系统 - 帮助团队自动采集、分析使用数据，持�
 
 #### 方式 1: 通过 Git URL 安装（推荐）
 
+**步骤 1**: 添加 Marketplace 源
 ```bash
-claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
-# 或简写
-claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin marketplace add https://github.com/zhangj1164/claude-usage-analysis-plugin
 ```
 
-或安装特定版本：
+**步骤 2**: 安装插件（插件名为 `usage-analytics`）
 ```bash
-claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin install usage-analytics
 # 或简写
-claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin@v1.0.0
+claude plugin i usage-analytics
 ```
 
-#### 方式 2: 手动安装
+#### 方式 2: 本地安装
 
 1. 克隆本仓库：
 ```bash
 git clone https://github.com/zhangj1164/claude-usage-analysis-plugin.git
 ```
 
-2. 在 Claude Code 中添加本地插件：
+2. 添加本地 Marketplace 源并安装：
 ```bash
-claude plugin install ./claude-usage-analysis-plugin
+claude plugin marketplace add ./claude-usage-analysis-plugin
+claude plugin install usage-analytics
 ```
 
 #### 方式 3: 通过项目配置自动安装
@@ -234,17 +234,16 @@ This is a complete Claude Code usage analytics system with four roles working to
 
 #### Option 1: Install via Git URL (Recommended)
 
+**Step 1**: Add the marketplace source
 ```bash
-claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
-# 或简写
-claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin
+claude plugin marketplace add https://github.com/zhangj1164/claude-usage-analysis-plugin
 ```
 
-Or install a specific version:
+**Step 2**: Install the plugin (plugin name is `usage-analytics`)
 ```bash
-claude plugin install https://github.com/zhangj1164/claude-usage-analysis-plugin
-# 或简写
-claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin@v1.0.0
+claude plugin install usage-analytics
+# or shorthand
+claude plugin i usage-analytics
 ```
 
 #### Option 2: Manual Installation
@@ -254,9 +253,10 @@ claude plugin i https://github.com/zhangj1164/claude-usage-analysis-plugin@v1.0.
 git clone https://github.com/zhangj1164/claude-usage-analysis-plugin.git
 ```
 
-2. Add the local plugin in Claude Code:
+2. Add local marketplace and install:
 ```bash
-claude plugin install ./claude-usage-analysis-plugin
+claude plugin marketplace add ./claude-usage-analysis-plugin
+claude plugin install usage-analytics
 ```
 
 #### Option 3: Auto-install via Project Configuration
