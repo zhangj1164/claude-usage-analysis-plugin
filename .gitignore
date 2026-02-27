@@ -44,5 +44,5 @@ tmp/
 temp/
 
 # Claude specific - user data (keep examples)
-.claude/*
+.claude/*.local.*
 !.claude/CLAUDE.md
