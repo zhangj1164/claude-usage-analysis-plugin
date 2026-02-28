@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-02-28
+
+### Fixed
+- **Hook**: 修复 `keyword_router.py` action 类型错误
+  - `type`: `"skill"` → `"invoke_skill"` (符合 Claude Code API 规范)
+  - `skill`: `"usage-observer"` → `"usage-analytics:usage-observer"` (使用完整引用名)
+- 修复 API Error: 400 "Request body format invalid" 错误
+
 ## [1.0.0] - 2026-02-26
 
 ### Added
@@ -52,5 +60,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - System architecture documentation
 - Usage examples and workflows
 
-[Unreleased]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.0.1
 [1.0.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.0.0

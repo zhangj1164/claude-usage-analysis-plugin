@@ -1,5 +1,24 @@
 # Pre-Publish Checklist
 
+## ✅ Version Release
+
+### Before Push (版本发布前检查)
+
+- [ ] **更新版本号**: 修改 `marketplace.json` 和 `.claude-plugin/marketplace.json` 中的 `version` 字段
+- [ ] **更新 CHANGELOG.md**: 添加新版本变更记录，遵循 [Keep a Changelog](https://keepachangelog.com/) 规范
+- [ ] **提交变更**: `git add -A && git commit -m "bump: 更新版本号到 X.X.X"`
+- [ ] **创建标签** (可选): `git tag -a vX.X.X -m "Release vX.X.X"`
+- [ ] **推送到 GitHub**: `git push && git push origin vX.X.X` (如果打了标签)
+
+### Version Numbering (版本号规则)
+
+遵循 [Semantic Versioning](https://semver.org/):
+- **MAJOR**: 不兼容的 API 修改
+- **MINOR**: 向下兼容的功能新增
+- **PATCH**: 向下兼容的问题修复
+
+---
+
 ## ✅ GitHub Repository Setup
 
 ### 1. Create Repository on GitHub
