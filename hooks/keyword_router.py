@@ -33,8 +33,8 @@ def contains_keywords(text, keywords):
 def process_input():
     """处理从 stdin 接收的 JSON 输入"""
     try:
-        # 读取 stdin
-        input_data = sys.stdin.read()
+        # 读取 stdin (使用 UTF-8 编码)
+        input_data = sys.stdin.buffer.read().decode('utf-8')
         data = json.loads(input_data)
 
         # 获取用户输入
