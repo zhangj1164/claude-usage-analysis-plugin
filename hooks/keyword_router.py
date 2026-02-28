@@ -50,8 +50,8 @@ def process_input():
         # 检查是否匹配 usage-observer 关键词
         if contains_keywords(user_input, KEYWORD_MAP["usage-observer"]):
             result["actions"].append({
-                "type": "skill",
-                "skill": "usage-observer",
+                "type": "invoke_skill",
+                "skill": "usage-analytics:usage-observer",
                 "params": {
                     "user_input": user_input,
                     "session_id": session_id
