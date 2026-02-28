@@ -32,38 +32,12 @@
     }
   ],
   "hooks": {
-    "UserPromptSubmit": {
-      "command": "skill:usage-observer",
-      "description": "自动检测用户会话中的问题，由 usage-observer 分析后调用 usage-recorder 完成数据记录",
-      "chain": [
-        "usage-observer",
-        "usage-recorder"
-      ],
-      "condition": {
-        "type": "keyword",
-        "keywords": [
-          "错误",
-          "失败",
-          "问题",
-          "报错",
-          "error",
-          "exception",
-          "bug",
-          "不对",
-          "错了",
-          "有问题",
-          "failed",
-          "fail",
-          "wrong",
-          "issue",
-          "crash",
-          "timeout",
-          "超时",
-          "无法",
-          "不能",
-          "broken"
-        ]
+    "UserPromptSubmit": [
+      {
+        "type": "command",
+        "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py",
+        "description": "检测用户输入中的问题关键词，自动触发 usage-observer skill"
       }
-    }
+    ]
   }
 }
