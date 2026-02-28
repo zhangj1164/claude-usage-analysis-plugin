@@ -333,22 +333,61 @@ skill:usage-recorder --stage "调试" --problem "运行测试时报错，提示�
 
 ### 配置方式
 
-在 `marketplace.json` 中已配置 hooks：
+通过 `skill-rules.json` 实现关键词与 skill 的绑定：
 
+**skill-rules.json:**
 ```json
 {
-  "hooks": {
-    "UserPromptSubmit": {
-      "command": "skill:usage-observer",
-      "description": "自动检测用户会话中的问题并采集使用数据",
-      "condition": {
+  "$schema": "https://code.claude.com/schemas/skill-rules.json",
+  "version": "1.0.0",
+  "rules": [
+    {
+      "id": "usage-observer-auto-trigger",
+      "name": "Usage Observer Auto Trigger",
+      "skill": "usage-analytics:usage-observer",
+      "trigger": {
         "type": "keyword",
-        "keywords": ["错误", "失败", "问题", "报错", "error", "exception", "bug", "不对", "错了", "有问题", "failed", "fail", "wrong", "issue", "crash", "timeout", "超时", "无法", "不能", "broken"]
+        "keywords": ["错误", "失败", "问题", "报错", "error", "exception", "bug", ...],
+        "match": "any",
+        "caseSensitive": false
+      },
+      "context": {
+        "hook": "UserPromptSubmit",
+        "priority": 100
+      },
+      "action": {
+        "type": "invoke",
+        "params": { "auto_triggered": true }
       }
     }
+  ]
+}
+```
+
+**marketplace.json:**
+```json
+{
+  "plugins": [{
+    "name": "usage-analytics",
+    "skillRules": "./skill-rules.json"
+  }],
+  "hooks": {
+    "UserPromptSubmit": [{
+      "type": "skill-rules",
+      "source": "./skill-rules.json"
+    }]
   }
 }
 ```
+
+### 规则匹配优先级
+
+| 优先级 | Skill | 触发关键词 |
+|--------|-------|-----------|
+| 100 | usage-observer | 错误、error、bug 等问题关键词 |
+| 90 | usage-recorder | 记录这个问题、record this issue |
+| 80 | usage-analyst | 分析使用情况、generate report |
+| 70 | usage-coach | 改进建议、best practices |
 
 ### Hook 工作原理
 

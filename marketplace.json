@@ -28,15 +28,16 @@
         "./skills/usage-recorder",
         "./skills/usage-analyst",
         "./skills/usage-coach"
-      ]
+      ],
+      "skillRules": "./skill-rules.json"
     }
   ],
   "hooks": {
     "UserPromptSubmit": [
       {
-        "type": "command",
-        "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py",
-        "description": "检测用户输入中的问题关键词，自动触发 usage-observer skill"
+        "type": "skill-rules",
+        "source": "./skill-rules.json",
+        "description": "根据 skill-rules.json 中的规则自动触发对应的 skill"
       }
     ]
   }
