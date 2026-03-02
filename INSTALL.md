@@ -156,7 +156,7 @@ claude plugin list
 **解决**：
 ```bash
 # 验证配置文件格式
-python3 -m json.tool ~/.claude/config.json
+python -m json.tool ~/.claude/config.json
 ```
 
 #### 问题：数据没有保存

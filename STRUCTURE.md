@@ -214,10 +214,10 @@ claude plugin update claude-usage-analysis-plugin
 
 ```bash
 # Validate marketplace.json
-python3 -c "import json; json.load(open('marketplace.json'))"
+python -c "import json; json.load(open('marketplace.json'))"
 
 # Check skill structure
-python3 -c "
+python -c "
 import json
 import os
 

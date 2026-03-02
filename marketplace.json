@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "Claude Code 使用分析系统 - 帮助团队自动采集、分析使用数据，持续优化 Claude Code 使用体验的完整解决方案",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "tags": [
       "analytics",
       "productivity",
@@ -35,7 +35,7 @@
     "UserPromptSubmit": [
       {
         "type": "command",
-        "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py",
+        "command": "python ${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py",
         "description": "检测用户输入中的问题关键词，自动触发 usage-observer skill"
       }
     ]

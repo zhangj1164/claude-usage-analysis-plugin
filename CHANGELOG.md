@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-03-02
+
+### Fixed
+- **Windows 兼容性**: 修复 `python3` 命令在 Windows 下不存在的问题
+  - Hook 命令: `python3` → `python` (marketplace.json)
+  - 文档示例: `python3` → `python` (INSTALL.md, STRUCTURE.md)
+  - GitHub Actions: 保持 `python3` (Linux 容器环境)
+  - 脚本 shebang: 保持 `#!/usr/bin/env python3` (跨平台标准)
+
 ## [1.0.1] - 2026-02-28
 
 ### Fixed
@@ -60,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - System architecture documentation
 - Usage examples and workflows
 
-[Unreleased]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.0.2
 [1.0.1]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.0.1
 [1.0.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.0.0
