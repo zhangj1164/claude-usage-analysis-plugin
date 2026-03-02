@@ -1,23 +1,24 @@
 ---
 name: usage-observer
-description: 当用户在 Claude Code 会话中提到错误、失败、问题、报错、error、exception、bug、失败、不对、错了、有问题等关键词时自动触发。作为"观察者"角色，自动检测并采集团队成员使用 Claude 时遇到的问题数据，包括会话阶段、问题描述、问题类型、相关文档等，为后续分析和改进提供数据基础。此 skill 设计为在 UserPromptSubmit hook 中自动调用，无需用户主动触发，是 Claude 使用分析系统的数据入口。
+description: 当用户在 Claude Code 会话中提到错误、失败、问题、报错、error、exception、bug、失败、不对、错了、有问题等关键词时自动触发。作为"观察者"角色，自动检测并创建问题追踪记录，记录问题开始时间、会话ID等信息。此 skill 设计为在 UserPromptSubmit hook 中自动调用，无需用户主动触发，是 Claude 使用分析系统的数据入口。
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
   author: "Claude"
   role: "observer"
   system: "claude-usage-analytics"
-  trigger_keywords: ["错误", "失败", "问题", "报错", "error", "exception", "bug", "不对", "错了", "有问题", "failed", "fail", "wrong", "issue", "crash", "timeout", "超时", "无法", "不能", "broken"]
+  trigger_type: "problem_detection"
 ---
 
 # Usage Observer - 使用观察者
 
 ## Overview
 
-本 Skill 用于**自动检测** Claude Code 会话中的问题和使用情况。当用户在提问中提到错误、失败、问题等关键词时，本 skill 会自动分析对话内容，提取问题信息，然后调用 `usage-recorder` 完成数据记录。
+本 Skill 用于**自动检测** Claude Code 会话中的问题，创建问题追踪记录。当用户提到错误、失败、问题等关键词时，本 skill 会自动记录问题开始时间，等待后续 `usage-resolver` skill 检测解决信号后完成记录。
 
 **职责分工：**
-- **usage-observer (观察者)**: 自动检测问题，分析会话内容，提取关键信息
-- **usage-recorder (记录员)**: 接收 observer 传递的数据，完成实际存储
+- **usage-observer (观察者)**: 检测问题，创建追踪记录，记录开始时间
+- **usage-resolver (解决者)**: 检测解决信号，计算耗时，完成数据存储
+- **usage-recorder (记录员)**: 接收 resolver 传递的数据，完成实际存储
 
 数据最终存储在用户目录的 `.claude/claude-analysis/` 下，按日期分文件管理。
 
@@ -27,66 +28,35 @@ metadata:
 
 **当此 skill 被触发时，必须执行以下步骤：**
 
-### Step 1: 分析会话内容
+### Step 1: 分析问题内容
 
-从对话历史中提取以下信息：
+从用户输入中提取以下信息：
 1. **问题描述**: 从用户当前提问中提取核心问题
-2. **会话阶段**: 根据对话内容推断（需求分析/代码编写/调试/测试/部署）
-3. **步骤描述**: 分析用户之前的操作步骤
-4. **问题类型**: 自动分类（工具错误/理解偏差/执行失败/性能问题/其他）
-5. **解决方案**: 如果对话中已有解决方案，提取它
-6. **相关文档**: 提取对话中提及的文件路径
+2. **会话阶段**: 根据关键词推断（需求分析/代码编写/调试/测试/部署）
+3. **问题类型**: 自动分类（工具错误/理解偏差/执行失败/性能问题/其他）
+4. **相关文档**: 提取提及的文件路径（如有）
 
-### Step 2: 向用户确认信息
+### Step 2: 创建追踪记录
 
-使用 `AskUserQuestion` 工具询问用户：
+使用 `state_manager.py` 创建问题追踪记录：
 
-```
-📋 检测到问题，已自动分析：
+```python
+from state_manager import create_problem_entry, add_active_problem
 
-- 会话阶段: [推断的阶段]
-- 问题描述: [提取的问题]
-- 问题类型: [自动分类]
-- 相关文档: [提取的文件路径]
-- 解决方案: [如有]
+problem_entry = create_problem_entry(
+    session_id=params["session_id"],
+    problem="[问题描述]",
+    stage="[会话阶段]",
+    problem_type="[问题类型]",
+    user_input=params["user_input"]
+)
 
-请补充以下信息：
-1. 耗费时间约多少分钟？
-2. 问题是否已解决？
-3. 优先级（高/中/低）？
-4. 有其他备注吗？
-
-回复"跳过"可取消记录。
+add_active_problem(problem_entry)
 ```
 
-### Step 3: 调用 usage-recorder 完成记录
+### Step 3: 静默完成
 
-用户确认后，**必须**调用 `usage-recorder` skill：
-
-```bash
-python scripts/record_session.py \
-  --stage "[会话阶段]" \
-  --step "[步骤描述]" \
-  --problem "[问题描述]" \
-  --type "[问题类型]" \
-  --solution "[解决方案]" \
-  --docs "[相关文档]" \
-  --time "[耗费时间]" \
-  --priority "[优先级]" \
-  --status "[状态]"
-```
-
-### Step 4: 确认记录结果
-
-向用户展示记录结果：
-
-```
-✅ 已记录到 ~/.claude/claude-analysis/YYYY-MM-DD.md
-
-| 时间 | 阶段 | 问题 | 类型 | 耗时 | 状态 |
-|------|------|------|------|------|------|
-| HH:MM | [阶段] | [问题] | [类型] | [时间]分钟 | [状态] |
-```
+**不要向用户显示任何消息**，避免打断工作流程。后台自动完成追踪记录创建。
 
 ---
 
@@ -114,94 +84,9 @@ python scripts/record_session.py \
 
 ---
 
-## 示例执行流程
-
-### 示例 1: 自动触发
-
-**用户输入**: "运行 npm run dev 时报错，提示 Node 版本不匹配"
-
-**Step 1 - 自动分析**:
-- 会话阶段: 调试
-- 问题描述: 运行 npm run dev 时报错，提示 Node 版本不匹配
-- 问题类型: 执行失败
-- 相关文档: package.json
-- 解决方案: (待确认)
-
-**Step 2 - 询问用户**:
-```
-📋 检测到问题，已自动分析：
-
-- 会话阶段: 调试
-- 问题描述: 运行 npm run dev 时报错，提示 Node 版本不匹配
-- 问题类型: 执行失败
-- 相关文档: package.json
-
-请补充以下信息：
-1. 耗费时间约多少分钟？
-2. 问题是否已解决？
-3. 优先级（高/中/低）？
-```
-
-**用户回复**: "5分钟，已解决，中优先级"
-
-**Step 3 - 调用 recorder**:
-```bash
-python scripts/record_session.py \
-  --stage "调试" \
-  --step "运行 npm run dev" \
-  --problem "Node 版本不匹配" \
-  --type "执行失败" \
-  --solution "使用 nvm 切换 Node 版本" \
-  --docs "package.json" \
-  --time "5" \
-  --priority "中" \
-  --status "已解决"
-```
-
-**Step 4 - 确认结果**:
-```
-✅ 已记录到 ~/.claude/claude-analysis/2026-03-02.md
-
-| 时间 | 阶段 | 问题 | 类型 | 耗时 | 状态 |
-|------|------|------|------|------|------|
-| 10:35 | 调试 | Node 版本不匹配 | 执行失败 | 5分钟 | 已解决 |
-```
-
----
-
-## 脚本路径
-
-记录脚本位置：`scripts/record_session.py`
-
-### 参数说明
-
-| 参数 | 必需 | 说明 |
-|------|------|------|
-| `--stage` / `-s` | 否 | 会话阶段 |
-| `--step` | 否 | 步骤描述 |
-| `--problem` / `-p` | **是** | 问题描述 |
-| `--type` / `-t` | 否 | 问题类型 |
-| `--solution` | 否 | 解决方案 |
-| `--docs` | 否 | 相关文档 |
-| `--session` | 否 | Session ID |
-| `--time` | 否 | 耗时（分钟） |
-| `--priority` | 否 | 优先级（高/中/低） |
-| `--status` | 否 | 状态（已解决/待解决/需跟进） |
-| `--note` | 否 | 备注 |
-
----
-
-## 存储位置
-
-数据存储在用户主目录：
-- Windows: `%USERPROFILE%\.claude\claude-analysis\YYYY-MM-DD.md`
-- Mac/Linux: `~/.claude/claude-analysis/YYYY-MM-DD.md`
-
----
-
 ## 注意事项
 
-1. **必须调用 recorder**: observer 只负责分析，实际存储必须通过 `usage-recorder` 完成
-2. **必须询问用户**: 确认耗费时间和解决状态
-3. **可跳过记录**: 用户回复"跳过"时，取消记录流程
-4. **自动标记**: 记录时添加 `--auto-triggered` 标记表明是自动采集
+1. **静默执行**: 不向用户显示任何消息，完全后台运行
+2. **创建追踪记录**: 只记录开始时间和问题描述，等待解决信号
+3. **不调用 recorder**: 数据存储由 `usage-resolver` 完成
+4. **状态持久化**: 使用 `tracking_state.json` 跨 Hook 调用共享状态

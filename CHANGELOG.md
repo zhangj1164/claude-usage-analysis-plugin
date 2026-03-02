@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-03-02
+
+### Added
+- **自动问题追踪系统**: 全新的问题追踪架构，实现完全自动化的数据采集
+  - 新增 `usage-resolver` skill: 检测解决信号，自动计算耗时
+  - 新增 `state_manager.py`: 状态持久化模块，跨 Hook 调用共享数据
+  - 问题检测 + 解决检测的完整追踪链
+  - 无需用户确认，完全后台运行
+
+### Changed
+- **usage-observer 重构**: 从"询问式"改为"追踪式"
+  - 问题出现时创建追踪记录
+  - 记录开始时间和问题描述
+  - 等待解决信号完成记录
+
+### Fixed
+- **用户体验优化**: 消除打断用户工作流的确认消息
+  - 静默执行所有追踪操作
+  - 自动计算问题解决耗时
+  - 后台完成数据存储
+
 ## [1.0.2] - 2026-03-02
 
 ### Fixed
@@ -69,7 +90,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - System architecture documentation
 - Usage examples and workflows
 
-[Unreleased]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.1.0
 [1.0.2]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.0.2
 [1.0.1]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.0.1
 [1.0.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.0.0

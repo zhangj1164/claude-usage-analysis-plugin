@@ -9,18 +9,26 @@ import json
 import sys
 import re
 
-# 关键词配置
-KEYWORD_MAP = {
-    "usage-observer": [
-        # 中文关键词
-        "错误", "失败", "问题", "报错", "不对", "错了", "有问题",
-        "超时", "无法", "不能", "异常", "崩溃", "卡住", "慢",
-        # 英文关键词
-        "error", "exception", "bug", "failed", "fail", "wrong",
-        "issue", "crash", "timeout", "broken", "not working",
-        "doesn't work", "isn't working"
-    ]
-}
+# 问题关键词配置
+PROBLEM_KEYWORDS = [
+    # 中文
+    "错误", "失败", "问题", "报错", "不对", "错了", "有问题",
+    "超时", "无法", "不能", "异常", "崩溃", "卡住", "慢",
+    # 英文
+    "error", "exception", "bug", "failed", "fail", "wrong",
+    "issue", "crash", "timeout", "broken", "not working",
+    "doesn't work", "isn't working"
+]
+
+# 解决信号关键词
+RESOLUTION_KEYWORDS = [
+    # 中文
+    "好了", "解决了", "成功了", "谢谢", "可以了", "没问题了",
+    "修好了", "搞定了", "完成了", "弄好了",
+    # 英文
+    "done", "fixed", "works", "thanks", "solved",
+    "working now", "resolved", "it works", "perfect"
+]
 
 def contains_keywords(text, keywords):
     """检查文本中是否包含任一关键词（不区分大小写）"""
@@ -47,18 +55,29 @@ def process_input():
             "actions": []
         }
 
-        # 检查是否匹配 usage-observer 关键词
-        if contains_keywords(user_input, KEYWORD_MAP["usage-observer"]):
+        # 优先检测解决信号
+        if contains_keywords(user_input, RESOLUTION_KEYWORDS):
+            result["actions"].append({
+                "type": "invoke_skill",
+                "skill": "usage-analytics:usage-resolver",
+                "params": {
+                    "user_input": user_input,
+                    "session_id": session_id,
+                    "trigger_type": "resolution"
+                }
+            })
+
+        # 检测问题关键词
+        elif contains_keywords(user_input, PROBLEM_KEYWORDS):
             result["actions"].append({
                 "type": "invoke_skill",
                 "skill": "usage-analytics:usage-observer",
                 "params": {
                     "user_input": user_input,
-                    "session_id": session_id
+                    "session_id": session_id,
+                    "trigger_type": "problem"
                 }
             })
-            # 可以选择是否阻止默认处理
-            # result["decision"] = "block"
 
         # 输出结果
         print(json.dumps(result, ensure_ascii=False))
