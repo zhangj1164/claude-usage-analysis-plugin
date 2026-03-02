@@ -35,7 +35,7 @@
     "UserPromptSubmit": [
       {
         "type": "command",
-        "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py",
+        "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\"",
         "description": "检测用户输入中的问题关键词，自动触发 usage-observer skill"
       }
     ]
