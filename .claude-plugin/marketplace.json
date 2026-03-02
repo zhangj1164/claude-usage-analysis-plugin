@@ -3,11 +3,11 @@
   "name": "claude-usage-analysis-plugin",
   "owner": {
     "name": "zhangj1164",
-    "email": "your-email@example.com"
+    "email": "2430236902@qq.com"
   },
   "metadata": {
     "description": "Claude Code 使用分析系统 - 帮助团队自动采集、分析使用数据，持续优化 Claude Code 使用体验的完整解决方案",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "tags": [
       "analytics",
       "productivity",
