@@ -28,9 +28,6 @@
         "./skills/usage-recorder",
         "./skills/usage-analyst",
         "./skills/usage-coach"
-      ],
-      "agents": [
-        "./agents/problem-tracker"
       ]
     }
   ],
