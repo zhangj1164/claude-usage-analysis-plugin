@@ -38,20 +38,23 @@ metadata:
 
 ### Step 2: 创建追踪记录
 
-使用 `state_manager.py` 创建问题追踪记录：
+调用 auto_observer.py 脚本创建问题追踪记录：
+
+```bash
+python scripts/auto_observer.py \
+  --user-input "[用户输入]" \
+  --session-id "[会话ID]"
+```
+
+或使用 Python 直接调用：
 
 ```python
-from state_manager import create_problem_entry, add_active_problem
+from scripts.auto_observer import observe_problem
 
-problem_entry = create_problem_entry(
-    session_id=params["session_id"],
-    problem="[问题描述]",
-    stage="[会话阶段]",
-    problem_type="[问题类型]",
-    user_input=params["user_input"]
+result = observe_problem(
+    user_input=params["user_input"],
+    session_id=params["session_id"]
 )
-
-add_active_problem(problem_entry)
 ```
 
 ### Step 3: 静默完成

@@ -30,51 +30,31 @@ metadata:
 
 ### Step 1: 查找活动问题
 
-使用 `state_manager.py` 查找当前会话的活动问题：
-
-```python
-from state_manager import get_active_problems, resolve_problem
-
-# 获取当前会话的活动问题
-active_problems = get_active_problems(session_id=params["session_id"])
-
-if not active_problems:
-    # 没有活动问题，静默退出
-    return
-
-# 取最近的一个问题
-latest_problem = active_problems[-1]
-```
-
-### Step 2: 解决问题并计算耗时
-
-```python
-# 解决问题，自动计算耗时
-resolved_problem = resolve_problem(
-    problem_id=latest_problem["id"],
-    solution="已解决"  # 可从对话中提取具体解决方案
-)
-
-if resolved_problem:
-    elapsed_minutes = resolved_problem["elapsed_minutes"]
-    print(f"问题已追踪: {resolved_problem['problem']}, 耗时 {elapsed_minutes} 分钟")
-```
-
-### Step 3: 调用 usage-recorder
-
-将解决的问题数据传递给 `usage-recorder`：
+调用 auto_resolver.py 脚本查找并解决问题：
 
 ```bash
-python scripts/record_session.py \
-  --stage "[会话阶段]" \
-  --problem "[问题描述]" \
-  --type "[问题类型]" \
-  --time "[耗费时间]" \
-  --status "已解决" \
-  --note "自动追踪"
+python scripts/auto_resolver.py \
+  --user-input "[用户输入]" \
+  --session-id "[会话ID]"
 ```
 
-### Step 4: 静默完成
+或使用 Python 直接调用：
+
+```python
+from scripts.auto_resolver import resolve_and_record
+
+result = resolve_and_record(
+    session_id=params["session_id"],
+    user_input=params["user_input"]
+)
+```
+
+脚本会自动：
+1. 查找当前会话的活动问题
+2. 计算从问题开始到解决的耗时
+3. 调用 usage-recorder 完成数据存储
+
+### Step 2: 静默完成
 
 **不要向用户显示确认消息**，避免打断工作流程。
 

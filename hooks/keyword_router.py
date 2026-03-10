@@ -1,102 +1,105 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Keyword Router - UserPromptSubmit Hook 处理脚本
-根据用户输入中的关键词，决定调用哪个 skill
+Keyword Router - UserPromptSubmit Hook
+检测用户输入中的问题关键词，通过 additionalContext 注入指令让 Claude 调用对应 skill。
+同时在本地 tracking_state.json 中记录问题开始时间。
+
+输入: stdin JSON { "prompt": "...", "session_id": "...", "transcript_path": "..." }
+输出: stdout JSON { "hookSpecificOutput": { "hookEventName": "UserPromptSubmit", "additionalContext": "..." } }
 """
 
 import json
 import sys
-import re
+import os
+from datetime import datetime
+from pathlib import Path
 
-# 问题关键词配置
 PROBLEM_KEYWORDS = [
-    # 中文
     "错误", "失败", "问题", "报错", "不对", "错了", "有问题",
     "超时", "无法", "不能", "异常", "崩溃", "卡住", "慢",
-    # 英文
     "error", "exception", "bug", "failed", "fail", "wrong",
     "issue", "crash", "timeout", "broken", "not working",
     "doesn't work", "isn't working"
 ]
 
-# 解决信号关键词
-RESOLUTION_KEYWORDS = [
-    # 中文
-    "好了", "解决了", "成功了", "谢谢", "可以了", "没问题了",
-    "修好了", "搞定了", "完成了", "弄好了",
-    # 英文
-    "done", "fixed", "works", "thanks", "solved",
-    "working now", "resolved", "it works", "perfect"
-]
 
 def contains_keywords(text, keywords):
-    """检查文本中是否包含任一关键词（不区分大小写）"""
     text_lower = text.lower()
-    for keyword in keywords:
-        if keyword.lower() in text_lower:
+    for kw in keywords:
+        if kw.lower() in text_lower:
             return True
     return False
 
+
+def get_state_path():
+    return Path.home() / '.claude' / 'claude-analysis' / 'tracking_state.json'
+
+
+def record_problem_start(session_id, user_input):
+    """在 tracking_state.json 中记录问题开始时间"""
+    state_path = get_state_path()
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+
+    state = {}
+    if state_path.exists():
+        try:
+            state = json.loads(state_path.read_text(encoding='utf-8'))
+        except Exception:
+            state = {}
+
+    if "active_problems" not in state:
+        state["active_problems"] = []
+
+    problem_desc = user_input.strip()[:100]
+    if len(user_input.strip()) > 100:
+        problem_desc += "..."
+
+    entry = {
+        "id": f"p_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+        "session_id": session_id,
+        "problem": problem_desc,
+        "start_time": datetime.now().isoformat(),
+        "status": "active"
+    }
+    state["active_problems"].append(entry)
+    state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding='utf-8')
+    return entry
+
+
 def process_input():
-    """处理从 stdin 接收的 JSON 输入"""
     try:
-        # 读取 stdin (使用 UTF-8 编码)
         input_data = sys.stdin.buffer.read().decode('utf-8')
         data = json.loads(input_data)
 
-        # 获取用户输入
         user_input = data.get("prompt", "")
-        session_id = data.get("sessionId", "")
+        session_id = data.get("session_id", data.get("sessionId", ""))
 
-        # 检查结果
-        result = {
-            "decision": "continue",  # 默认继续正常处理
-            "actions": []
-        }
+        if contains_keywords(user_input, PROBLEM_KEYWORDS):
+            # 记录问题开始时间到本地文件
+            entry = record_problem_start(session_id, user_input)
 
-        # 优先检测解决信号
-        if contains_keywords(user_input, RESOLUTION_KEYWORDS):
-            result["actions"].append({
-                "type": "invoke_skill",
-                "skill": "usage-analytics:usage-resolver",
-                "params": {
-                    "user_input": user_input,
-                    "session_id": session_id,
-                    "trigger_type": "resolution"
+            # 通过 additionalContext 注入指令，让 Claude 调用 usage-observer skill
+            result = {
+                "hookSpecificOutput": {
+                    "hookEventName": "UserPromptSubmit",
+                    "additionalContext": (
+                        f"[usage-analytics] 检测到问题关键词，已创建追踪记录 {entry['id']}。"
+                        f"请在处理完用户的问题后，正常回复用户即可。"
+                        f"问题追踪将由 Stop hook 自动完成记录，无需额外操作。"
+                    )
                 }
-            })
+            }
+            print(json.dumps(result, ensure_ascii=False))
+        # 未检测到关键词，不输出任何内容（静默通过）
 
-        # 检测问题关键词
-        elif contains_keywords(user_input, PROBLEM_KEYWORDS):
-            result["actions"].append({
-                "type": "invoke_skill",
-                "skill": "usage-analytics:usage-observer",
-                "params": {
-                    "user_input": user_input,
-                    "session_id": session_id,
-                    "trigger_type": "problem"
-                }
-            })
-
-        # 输出结果
-        print(json.dumps(result, ensure_ascii=False))
         return 0
 
-    except json.JSONDecodeError as e:
-        error_result = {
-            "decision": "continue",
-            "error": f"Invalid JSON input: {str(e)}"
-        }
-        print(json.dumps(error_result, ensure_ascii=False))
-        return 1
     except Exception as e:
-        error_result = {
-            "decision": "continue",
-            "error": str(e)
-        }
-        print(json.dumps(error_result, ensure_ascii=False))
-        return 1
+        # hook 出错不应阻断用户操作
+        print(json.dumps({"error": str(e)}), file=sys.stderr)
+        return 0
+
 
 if __name__ == "__main__":
     sys.exit(process_input())
