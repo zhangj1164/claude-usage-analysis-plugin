@@ -1,5 +1,4 @@
 {
-  "$schema": "https://code.claude.com/schemas/marketplace.json",
   "name": "claude-usage-analysis-plugin",
   "owner": {
     "name": "zhangj1164",
