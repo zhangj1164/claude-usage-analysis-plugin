@@ -5,12 +5,13 @@ Stop Hook - Claude 回复完成后自动记录问题
 当 Claude 完成一轮回复时触发，检查是否有活动问题需要记录到日期文件。
 
 工作流程:
-1. 读取 tracking_state.json 中的活动问题
-2. 读取 transcript 判断问题是否已解决
-3. 将问题记录写入当天日期的 md 文件
-4. 从活动问题列表中移除已记录的问题
+1. 检查 stop_hook_active 防止无限循环
+2. 读取 tracking_state.json 中的活动问题
+3. 读取 transcript 判断问题是否已解决
+4. 将问题记录写入当天日期的 md 文件（统一 9 列格式）
+5. 从活动问题列表中移除已记录的问题
 
-输入: stdin JSON { "session_id": "...", "transcript_path": "..." }
+输入: stdin JSON { "session_id": "...", "transcript_path": "...", "stop_hook_active": false }
 输出: 无（静默执行）
 """
 
@@ -66,7 +67,6 @@ def check_transcript_for_resolution(transcript_path):
         return False, ""
     try:
         lines = tp.read_text(encoding='utf-8').strip().split('\n')
-        # 检查最后 10 行
         recent = lines[-10:] if len(lines) > 10 else lines
         recent_text = '\n'.join(recent).lower()
         for signal in RESOLUTION_SIGNALS:
@@ -88,31 +88,31 @@ def calc_elapsed_minutes(start_time_str):
 
 
 def append_to_daily_file(entry):
-    """将问题记录追加到当天的 md 文件"""
+    """将问题记录追加到当天的 md 文件（统一 9 列格式）"""
     file_path = get_daily_file_path()
     now = datetime.now()
 
     if not file_path.exists():
-        # 创建新文件并写入表头
         header = f"""# Claude Code 会话记录 - {now.strftime('%Y-%m-%d')}
 
 ## 详细记录
 
-| 时间戳 | 阶段 | 问题 | 类型 | 耗时 | 状态 | Session ID |
-|--------|------|------|------|------|------|------------|
+| 时间戳 | 阶段 | 步骤 | 问题 | 类型 | 解决方案 | 耗时 | 优先级 | 状态 |
+|--------|------|------|------|------|----------|------|--------|------|
 """
         file_path.write_text(header, encoding='utf-8')
 
-    # 追加记录行
     time_str = now.strftime('%H:%M')
     elapsed = entry.get('elapsed_minutes', 0)
     status = entry.get('status', '待确认')
     problem = entry.get('problem', '').replace('|', '\\|').replace('\n', ' ')
     stage = entry.get('stage', '未分类')
     ptype = entry.get('type', '其他')
-    session_id = entry.get('session_id', '')[:12]
+    step = entry.get('step', '-')
+    solution = entry.get('solution', '-')
+    priority = entry.get('priority', 'P2')
 
-    row = f"| {time_str} | {stage} | {problem} | {ptype} | {elapsed}分钟 | {status} | {session_id} |\n"
+    row = f"| {time_str} | {stage} | {step} | {problem} | {ptype} | {solution} | {elapsed}分钟 | {priority} | {status} |\n"
 
     with open(file_path, 'a', encoding='utf-8') as f:
         f.write(row)
@@ -154,6 +154,10 @@ def process_stop():
         input_data = sys.stdin.buffer.read().decode('utf-8')
         data = json.loads(input_data)
 
+        # 防止 Stop hook 无限循环
+        if data.get("stop_hook_active", False):
+            return 0
+
         session_id = data.get("session_id", "")
         transcript_path = data.get("transcript_path", "")
 
@@ -165,12 +169,11 @@ def process_stop():
 
         resolved, signal = check_transcript_for_resolution(transcript_path)
 
-        # 处理活动问题
         remaining = []
         for problem in active:
             elapsed = calc_elapsed_minutes(problem.get("start_time", ""))
 
-            # 如果已耗时超过 1 分钟（避免误触发立即记录）
+            # 如果耗时不足 0.5 分钟，避免误触发
             if elapsed < 0.5:
                 remaining.append(problem)
                 continue
@@ -182,6 +185,9 @@ def process_stop():
                 "elapsed_minutes": elapsed,
                 "stage": detect_stage(problem.get("problem", "")),
                 "type": detect_type(problem.get("problem", "")),
+                "step": "-",
+                "solution": signal if resolved else "-",
+                "priority": "P2",
                 "status": "已解决" if resolved else "处理中",
             }
             append_to_daily_file(entry)

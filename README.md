@@ -82,13 +82,13 @@ claude plugin install usage-analytics
     ↓
 UserPromptSubmit Hook 触发
     ↓
-检测问题关键词 → usage-observer 创建追踪记录
+检测问题关键词 → usage-observer 创建追踪记录（后台静默执行）
     ↓
 ... 用户解决问题 ...
     ↓
 用户输入: "好了，解决了"
     ↓
-检测解决信号 → usage-resolver 计算耗时并存储
+检测解决信号 → usage-resolver 计算耗时并存储（后台静默执行）
 ```
 
 **自动检测关键词：**
@@ -97,6 +97,12 @@ UserPromptSubmit Hook 触发
 |-----------|---------------|
 | 错误、失败、问题、报错 | 好了、解决了、谢谢 |
 | error, exception, bug, failed | done, fixed, works, thanks |
+
+**静默执行特性：**
+- Observer 和 Resolver 在后台自动运行
+- 不向用户显示任何消息
+- 不打断正常工作流程
+- 数据自动存储到本地 md 文件
 
 ### 📊 工作流程
 
@@ -190,21 +196,36 @@ Claude: "📊 个人使用周报：
 #### 场景 4: 团队头脑风暴
 
 ```
-用户: "我们团队怎么优化 Claude 使用？"
+用户: "我们团队要复盘，分析一下这些数据"
       ↓
-[调用 usage-analyst + usage-coach]
+[调用 usage-analyst 团队分析]
       ↓
-Claude: "💭 基于团队数据，我们来头脑风暴：
+用户: 提供各成员的 md 文件路径
+      ↓
+[使用 team_analyzer.py 合并分析]
+      ↓
+Claude: "📊 团队数据分析报告
 
-        发现的问题：
-        1. Skill description 不清晰（18次）
+        整体概况：
+        - 成员数: 3 人
+        - 总记录: 45 条
+        - 解决率: 82%
 
-        可能的解决方案：
-        A. 编写培训材料
-        B. 建立 Review 机制
-        C. 创建模板库
+        高频问题 TOP 3：
+        1. 文件查找困难 (8次)
+        2. Skill 未触发 (6次)
 
-        你觉得哪个方案最适合？"
+        💡 改进建议：
+        1. 组织技巧分享会
+        2. 优化 Skill 编写规范"
+```
+
+**团队数据合并分析：**
+```bash
+# 合并分析多个成员的 md 文件
+python skills/usage-analyst/scripts/team_analyzer.py \
+  --merge-files member1.md member2.md member3.md \
+  --output team_report.md
 ```
 
 ### 📁 数据存储
@@ -221,6 +242,19 @@ Claude: "💭 基于团队数据，我们来头脑风暴：
 │   └── monthly_2024-01.md
 ├── insights/               # 洞察总结
 └── knowledge/              # 知识沉淀
+```
+
+**团队数据目录结构（用于团队分析）：**
+```
+team-data/
+├── member1/
+│   ├── 2024-01-15.md
+│   └── 2024-01-16.md
+├── member2/
+│   ├── 2024-01-15.md
+│   └── 2024-01-16.md
+└── member3/
+    └── 2024-01-15.md
 ```
 
 **自动追踪记录示例：**

@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "Claude Code 使用分析系统 - 帮助团队自动采集、分析使用数据，持续优化 Claude Code 使用体验的完整解决方案",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "tags": [
       "analytics",
       "productivity",
@@ -29,6 +29,9 @@
         "./skills/usage-recorder",
         "./skills/usage-analyst",
         "./skills/usage-coach"
+      ],
+      "agents": [
+        "./agents/"
       ]
     }
   ],
@@ -36,14 +39,14 @@
     "UserPromptSubmit": [
       {
         "type": "command",
-        "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\"",
-        "description": "检测用户输入中的问题关键词，创建追踪记录并注入上下文"
+        "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\" 2>/dev/null || python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\"",
+        "description": "检测用户输入中的问题关键词，创建追踪记录并引导 Claude 委托 problem-tracker agent"
       }
     ],
     "Stop": [
       {
         "type": "command",
-        "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\"",
+        "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\" 2>/dev/null || python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\"",
         "description": "Claude 回复完成后，自动将活动问题记录到当天日期的 md 文件"
       }
     ]

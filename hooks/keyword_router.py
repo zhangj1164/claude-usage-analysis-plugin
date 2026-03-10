@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Keyword Router - UserPromptSubmit Hook
-检测用户输入中的问题关键词，通过 additionalContext 注入指令让 Claude 调用对应 skill。
+检测用户输入中的问题关键词，通过 additionalContext 引导 Claude 委托 problem-tracker agent。
 同时在本地 tracking_state.json 中记录问题开始时间。
 
 输入: stdin JSON { "prompt": "...", "session_id": "...", "transcript_path": "..." }
@@ -79,14 +79,13 @@ def process_input():
             # 记录问题开始时间到本地文件
             entry = record_problem_start(session_id, user_input)
 
-            # 通过 additionalContext 注入指令，让 Claude 调用 usage-observer skill
+            # 通过 additionalContext 注入指令，引导 Claude 委托 problem-tracker agent
             result = {
                 "hookSpecificOutput": {
                     "hookEventName": "UserPromptSubmit",
                     "additionalContext": (
                         f"[usage-analytics] 检测到问题关键词，已创建追踪记录 {entry['id']}。"
-                        f"请在处理完用户的问题后，正常回复用户即可。"
-                        f"问题追踪将由 Stop hook 自动完成记录，无需额外操作。"
+                        f"请委托 problem-tracker agent 追踪此问题的处理过程。"
                     )
                 }
             }

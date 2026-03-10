@@ -145,12 +145,12 @@ TOP 3 高频问题：
 - 分析深度：概览 / 详细 / 深度
 
 ### Step 2: 读取数据
-使用脚本读取对应时间段的数据：
+直接读取 `~/.claude/claude-analysis/` 目录下的日期 md 文件，解析其中的表格数据。
+
+如需团队数据分析，使用 team_analyzer.py：
 ```bash
-python scripts/analyze_usage.py \
-  --period week \
-  --user personal \
-  --output report.md
+python scripts/team_analyzer.py --personal
+python scripts/team_analyzer.py --team-dir /path/to/team-data
 ```
 
 ### Step 3: 生成报告
@@ -169,27 +169,28 @@ python scripts/analyze_usage.py \
 
 ## 脚本使用
 
-### analyze_usage.py - 分析使用数据
+### team_analyzer.py - 团队数据分析
+
+分析团队使用数据，支持个人和团队维度。
 
 **参数：**
-- `--period` / `-p`: 时间周期（day/week/month/quarter/custom）
-- `--date` / `-d`: 指定日期/起始日期
-- `--end-date`: 结束日期（自定义周期）
-- `--user` / `-u`: 用户范围（personal/team/all）
-- `--type`: 分析类型（overview/detailed/deep）
-- `--format` / `-f`: 输出格式（markdown/json/html）
+- `--merge-files`: 合并分析多个 md 文件
+- `--team-dir`: 分析团队数据目录
+- `--personal`: 分析个人数据
+- `--start-date`: 起始日期
+- `--end-date`: 结束日期
 - `--output` / `-o`: 输出文件路径
 
 **示例：**
 ```bash
-# 分析本周个人数据
-python scripts/analyze_usage.py --period week --user personal
+# 分析个人数据
+python scripts/team_analyzer.py --personal
 
-# 分析团队月度详细报告
-python scripts/analyze_usage.py --period month --user team --type detailed
+# 分析团队目录
+python scripts/team_analyzer.py --team-dir /path/to/team-data
 
-# 导出为 JSON 供其他系统使用
-python scripts/analyze_usage.py --period week --format json --output stats.json
+# 合并多个文件分析
+python scripts/team_analyzer.py --merge-files member1.md member2.md
 ```
 
 ### md_to_html.py - Markdown 转 HTML
@@ -368,8 +369,9 @@ python skills/usage-analyst/scripts/md_to_html.py -i weekly_report.md
 ### 完整示例
 
 ```bash
-# 1. 分析本周数据并生成报告
-python scripts/analyze_usage.py --period week --user personal -o weekly_report.md
+# 1. 分析本周数据并生成报告（由 Claude 读取 md 文件直接生成）
+# 或使用团队分析脚本
+python scripts/team_analyzer.py --personal -o weekly_report.md
 
 # 2. 转换为 HTML
 python scripts/md_to_html.py -i weekly_report.md -o weekly_report.html
@@ -390,6 +392,108 @@ xdg-open weekly_report.html
 python skills/usage-analyst/scripts/md_to_html.py --batch
 
 # HTML 文件将生成在 ~/.claude/claude-analysis/html/
+```
+
+## 团队头脑风暴分析
+
+### 功能概述
+
+支持读取多个团队成员提供的 md 文档，合并分析并给出改进建议，适合团队复盘和头脑风暴场景。
+
+### 使用方式
+
+#### 方式 1: 合并分析多个 md 文件
+
+```bash
+# 分析多个团队成员的 md 文件
+python scripts/team_analyzer.py --merge-files member1.md member2.md member3.md
+
+# 指定输出文件
+python scripts/team_analyzer.py --merge-files *.md --output team_report.md
+```
+
+#### 方式 2: 分析团队数据目录
+
+```bash
+# 分析团队目录（每个子目录代表一个成员）
+python scripts/team_analyzer.py --team-dir /path/to/team-data
+
+# 指定日期范围
+python scripts/team_analyzer.py --team-dir /path/to/team-data \
+  --start-date 2024-01-01 --end-date 2024-01-31
+```
+
+### 团队头脑风暴流程
+
+当用户说"团队头脑风暴"或"分析团队问题数据"时：
+
+**Step 1: 收集数据**
+- 询问用户提供各团队成员的 md 文件路径
+- 或指定团队数据目录
+
+**Step 2: 合并分析**
+- 使用 team_analyzer.py 合并数据
+- 生成整体统计和成员对比
+
+**Step 3: 识别改进机会**
+- 高频问题分析
+- 问题类型分布
+- 解决效率对比
+
+**Step 4: 生成建议**
+- 针对性改进措施
+- 最佳实践推荐
+- 培训建议
+
+### 示例对话
+
+**User:** "我们团队要复盘，分析一下这些数据"
+
+**Claude:**
+```
+💭 团队数据分析
+
+请提供团队成员的数据文件：
+- 可以是多个 .md 文件路径
+- 或团队数据目录路径
+
+我会帮你：
+1. 合并分析所有数据
+2. 识别高频问题
+3. 对比各成员情况
+4. 给出改进建议
+```
+
+**User:** "/data/member1.md /data/member2.md /data/member3.md"
+
+**Claude:**
+```
+📊 团队数据分析报告
+
+整体概况：
+├─ 成员数: 3 人
+├─ 总记录: 45 条
+├─ 总耗时: 12.5 小时
+└─ 解决率: 82%
+
+成员对比：
+| 成员 | 记录数 | 耗时 | 解决率 |
+|------|--------|------|--------|
+| member1 | 18 | 5.2h | 89% |
+| member2 | 15 | 4.1h | 80% |
+| member3 | 12 | 3.2h | 75% |
+
+高频问题 TOP 3：
+1. 文件查找困难 (8次)
+2. Skill 未触发 (6次)
+3. 测试断言失败 (5次)
+
+💡 改进建议：
+1. 组织文件查找技巧分享会
+2. 优化 Skill description 编写规范
+3. 建立测试问题 FAQ
+
+需要进一步分析某个具体问题吗？
 ```
 
 ## 存储位置
