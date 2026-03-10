@@ -31,7 +31,7 @@
         "./skills/usage-coach"
       ],
       "agents": [
-        "./agents/"
+        "./agents/problem-tracker"
       ]
     }
   ],
