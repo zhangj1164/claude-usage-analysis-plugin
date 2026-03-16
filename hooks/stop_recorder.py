@@ -162,41 +162,64 @@ def process_stop():
         transcript_path = data.get("transcript_path", "")
 
         state = load_state()
+
+        # 处理已解决的问题（由 keyword_router.py 标记）
+        resolved = state.get("resolved_problems", [])
+        for entry in resolved:
+            # 写入日期文件
+            record = {
+                "problem": entry.get("problem", ""),
+                "session_id": entry.get("session_id", ""),
+                "start_time": entry.get("start_time", ""),
+                "end_time": entry.get("end_time", ""),
+                "elapsed_minutes": entry.get("elapsed_minutes", 0),
+                "stage": detect_stage(entry.get("problem", "")),
+                "type": detect_type(entry.get("problem", "")),
+                "step": "-",
+                "solution": "已解决",
+                "priority": "P2",
+                "status": "已解决",
+            }
+            append_to_daily_file(record)
+
+        # 清空已解决问题列表
+        state["resolved_problems"] = []
+
+        # 处理活跃问题（原有的 Stop hook 逻辑）
         active = state.get("active_problems", [])
 
-        if not active:
-            return 0
+        if active:
+            resolved_in_transcript, signal = check_transcript_for_resolution(transcript_path)
 
-        resolved, signal = check_transcript_for_resolution(transcript_path)
+            remaining = []
+            for problem in active:
+                elapsed = calc_elapsed_minutes(problem.get("start_time", ""))
 
-        remaining = []
-        for problem in active:
-            elapsed = calc_elapsed_minutes(problem.get("start_time", ""))
+                # 如果耗时不足 0.5 分钟，避免误触发
+                if elapsed < 0.5:
+                    remaining.append(problem)
+                    continue
 
-            # 如果耗时不足 0.5 分钟，避免误触发
-            if elapsed < 0.5:
-                remaining.append(problem)
-                continue
+                entry = {
+                    "problem": problem.get("problem", ""),
+                    "session_id": problem.get("session_id", ""),
+                    "start_time": problem.get("start_time", ""),
+                    "elapsed_minutes": elapsed,
+                    "stage": detect_stage(problem.get("problem", "")),
+                    "type": detect_type(problem.get("problem", "")),
+                    "step": "-",
+                    "solution": signal if resolved_in_transcript else "-",
+                    "priority": "P2",
+                    "status": "已解决" if resolved_in_transcript else "处理中",
+                }
+                append_to_daily_file(entry)
 
-            entry = {
-                "problem": problem.get("problem", ""),
-                "session_id": problem.get("session_id", ""),
-                "start_time": problem.get("start_time", ""),
-                "elapsed_minutes": elapsed,
-                "stage": detect_stage(problem.get("problem", "")),
-                "type": detect_type(problem.get("problem", "")),
-                "step": "-",
-                "solution": signal if resolved else "-",
-                "priority": "P2",
-                "status": "已解决" if resolved else "处理中",
-            }
-            append_to_daily_file(entry)
+                # 只有已解决的才从列表移除
+                if not resolved_in_transcript:
+                    remaining.append(problem)
 
-            # 只有已解决的才从列表移除
-            if not resolved:
-                remaining.append(problem)
+            state["active_problems"] = remaining
 
-        state["active_problems"] = remaining
         save_state(state)
 
         return 0
