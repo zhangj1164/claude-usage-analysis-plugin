@@ -138,8 +138,10 @@ def process_input():
                     "hookSpecificOutput": {
                         "hookEventName": "UserPromptSubmit",
                         "additionalContext": (
-                            f"[usage-analytics] 检测到问题已解决，耗时 {resolved_entry.get('elapsed_minutes', 0)} 分钟。"
-                            f"问题 ID: {resolved_entry.get('id')} 已归档。"
+                            f"[usage-analytics] 检测到问题已解决，耗时 {resolved_entry.get('elapsed_minutes', 0)} 分钟。\n\n"
+                            f"**必须执行的操作**：立即调用 /usage-analytics:usage-recorder skill 记录此问题的解决方案。\n"
+                            f"问题 ID: {resolved_entry.get('id')} 已归档到 tracking_state.json。\n"
+                            f"此操作会在后台静默完成，不影响对用户问题的处理。"
                         )
                     }
                 }
@@ -151,13 +153,15 @@ def process_input():
             # 记录问题开始时间到本地文件
             entry = record_problem_start(session_id, user_input)
 
-            # 通过 additionalContext 注入指令，引导 Claude 委托 problem-tracker agent
+            # 通过 additionalContext 强制调用 usage-observer skill
             result = {
                 "hookSpecificOutput": {
                     "hookEventName": "UserPromptSubmit",
                     "additionalContext": (
-                        f"[usage-analytics] 检测到问题关键词，已创建追踪记录 {entry['id']}。"
-                        f"请委托 problem-tracker agent 追踪此问题的处理过程。"
+                        f"[usage-analytics] 检测到问题关键词，已创建追踪记录 {entry['id']}。\n\n"
+                        f"**必须执行的操作**：立即调用 /usage-analytics:usage-observer skill 观察此问题。\n"
+                        f"此操作会在后台静默完成，不影响对用户问题的处理。\n"
+                        f"问题追踪将由 Stop hook 自动完成记录。"
                     )
                 }
             }

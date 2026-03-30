@@ -1,52 +1,50 @@
 ---
 name: usage-observer
-description: 当用户在 Claude Code 会话中提到错误、失败、问题、报错、error、exception、bug、失败、不对、错了、有问题等关键词时自动触发。作为"观察者"角色，自动检测并创建问题追踪记录，记录问题开始时间、会话ID等信息。此 skill 设计为在 UserPromptSubmit hook 中自动调用，无需用户主动触发，是 Claude 使用分析系统的数据入口。
+description: 当用户在 Claude Code 会话中提到错误、失败、问题、报错、error、exception、bug、不对、错了、有问题等关键词时自动触发。此 skill 由 UserPromptSubmit hook 自动调用，无需用户手动触发。
 metadata:
-  version: "3.0.0"
+  version: "4.0.0"
   author: "Claude"
   role: "observer"
   system: "claude-usage-analytics"
-  trigger_type: "problem_detection"
+  trigger_type: "automatic"
 ---
 
 # Usage Observer - 使用观察者
 
 ## Overview
 
-本 Skill 是 **problem-tracker SubAgent** 的核心能力之一。当用户提到错误、失败、问题等关键词时，UserPromptSubmit hook 会创建追踪记录并引导 Claude 委托 problem-tracker agent，该 agent 以本 skill 的角色观察问题。
+本 Skill 是 **usage-analytics 自动追踪系统**的核心组件。当 UserPromptSubmit hook (keyword_router.py) 检测到问题关键词时，会通过 additionalContext 自动触发本 skill。
 
-**架构流程：**
+**自动触发流程：**
 ```
-用户输入问题关键词
+用户输入包含问题关键词
     ↓
 UserPromptSubmit Hook (keyword_router.py)
     ├─ 创建 tracking_state.json 追踪记录
-    └─ additionalContext 引导委托 problem-tracker agent
+    └─ additionalContext 强制调用本 skill
     ↓
-problem-tracker SubAgent（使用本 skill）
-    ├─ 提取问题描述、阶段、类型
-    └─ 静默完成
+usage-observer skill（当前）
+    ├─ 从上下文提取问题描述、阶段、类型
+    └─ 静默完成，不干扰用户对话
     ↓
 Stop Hook (stop_recorder.py)
-    └─ 自动记录到日期 md 文件
+    └─ Claude 回复完成后自动记录到日期 md 文件
 ```
 
 **职责分工：**
-- **keyword_router.py (Hook)**: 检测关键词，创建追踪记录
-- **problem-tracker (SubAgent)**: 使用本 skill 观察问题上下文
-- **stop_recorder.py (Hook)**: 自动记录到日期文件，判断是否已解决
-
-数据最终存储在用户目录的 `.claude/claude-analysis/` 下，按日期分文件管理。
+- **keyword_router.py**: 检测关键词，创建追踪记录，触发本 skill
+- **usage-observer (本 skill)**: 观察问题上下文，静默完成
+- **stop_recorder.py**: 自动记录到日期文件
 
 ---
 
 ## 执行指令
 
-**当此 skill 被 problem-tracker agent 调用时，执行以下步骤：**
+**当此 skill 被 hook 自动触发时，立即执行以下步骤：**
 
 ### Step 1: 分析问题内容
 
-从用户输入中提取以下信息：
+从用户输入和会话上下文中提取：
 1. **问题描述**: 从用户当前提问中提取核心问题
 2. **会话阶段**: 根据关键词推断（需求分析/代码编写/调试/测试/部署）
 3. **问题类型**: 自动分类（工具错误/理解偏差/执行失败/性能问题/其他）
@@ -88,7 +86,7 @@ Stop Hook (stop_recorder.py)
 
 ## 注意事项
 
-1. **静默执行**: 不向用户显示任何消息，完全后台运行
-2. **不直接记录数据**: 数据记录由 Stop hook 自动完成
-3. **状态持久化**: 使用 `tracking_state.json` 跨 Hook 调用共享状态
-4. **与 SubAgent 配合**: 本 skill 由 problem-tracker agent 调用，不再直接调用脚本
+1. **自动触发**: 由 hook 通过 additionalContext 自动调用，无需用户手动触发
+2. **静默执行**: 不向用户显示任何消息，完全后台运行
+3. **不直接记录数据**: 数据记录由 Stop hook 自动完成
+4. **状态持久化**: 使用 `tracking_state.json` 跨 Hook 调用共享状态
