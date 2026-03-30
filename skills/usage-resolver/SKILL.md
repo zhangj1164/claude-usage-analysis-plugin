@@ -1,12 +1,12 @@
 ---
 name: usage-resolver
-description: 当用户在 Claude Code 会话中提到解决信号关键词（如"好了"、"解决了"、"谢谢"、"done"、"fixed"等）时自动触发。作为"解决者"角色，检测问题解决信号，计算耗费时间，调用 usage-recorder 完成数据存储。此 skill 设计为在 UserPromptSubmit hook 中自动调用，与 usage-observer 配合工作。
+description: 当用户在 Claude Code 会话中提到解决信号关键词（如"好了"、"解决了"、"谢谢"、"done"、"fixed"等）时自动触发。作为"解决者"角色，配合 keyword_router.py 和 stop_recorder.py 完成问题状态更新。此 skill 由 UserPromptSubmit hook 自动调用，无需用户手动触发。
 metadata:
   version: "2.1.0"
   author: "Claude"
   role: "resolver"
   system: "claude-usage-analytics"
-  trigger_type: "resolution_detection"
+  trigger_type: "automatic"
 ---
 
 # Usage Resolver - 问题解决者

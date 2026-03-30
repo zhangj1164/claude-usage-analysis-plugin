@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-03-30
+
+### Changed
+- **Hook 自动触发 Skills**: Hook 通过 additionalContext 直接调用 skills
+  - 检测问题关键词时，强制调用 `/usage-analytics:usage-observer`
+  - 检测解决信号时，强制调用 `/usage-analytics:usage-recorder`
+  - 使用强制性指令确保 Claude 执行 skills
+  - 移除中间 agent 环节，提高触发可靠性
+
+### Removed
+- **Agent 架构**: 移除 problem-tracker agent 中间层
+  - 从 "Hook → agent → skills" 改为 "Hook → skills"
+  - 简化架构，减少故障点
+
+### Updated
+- **usage-observer** v3.0.0 → v4.0.0
+  - 描述改为"由 UserPromptSubmit hook 自动调用"
+  - `trigger_type: automatic`
+- **usage-recorder** v1.0.0 → v2.0.0
+  - 简化为自动触发场景
+  - `trigger_type: automatic`
+
+## [2.0.0] - 2026-03-10
+
+### Added
+- **problem-tracker Agent**: SubAgent 定义文件
+  - `agents/problem-tracker.md` 带 YAML frontmatter
+  - 支持自动委托功能
+
+### Changed
+- **架构重构**: Hook + SubAgent 模式
+  - UserPromptSubmit hook 检测关键词并创建追踪记录
+  - 通过 additionalContext 引导委托 problem-tracker agent
+  - Stop hook 自动记录到日期文件
+
+### Fixed
+- **stop_recorder.py**: 防止 Stop hook 无限循环
+  - 检查 `stop_hook_active` 布尔值
+- **数据格式统一**: 9 列表格格式
+  - `| 时间戳 | 阶段 | 步骤 | 问题 | 类型 | 解决方案 | 耗时 | 优先级 | 状态 |`
+- **Windows 兼容性**: Hook 命令跨平台支持
+  - `py -3 ... || python3 ... || python ...`
+
+### Removed
+- 删除冗余脚本：
+  - `skills/usage-observer/scripts/auto_observer.py`
+  - `skills/usage-observer/scripts/record_session.py`
+  - `skills/usage-observer/scripts/view_records.py`
+  - `skills/usage-resolver/scripts/auto_resolver.py`
+
 ## [1.1.0] - 2026-03-02
 
 ### Added
@@ -90,7 +140,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - System architecture documentation
 - Usage examples and workflows
 
-[Unreleased]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.1.0
 [1.0.2]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.0.2
 [1.0.1]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.0.1

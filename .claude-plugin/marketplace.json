@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Claude Code 使用分析系统 - 帮助团队自动采集、分析使用数据，持续优化 Claude Code 使用体验的完整解决方案",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "tags": [
       "analytics",
       "productivity",
