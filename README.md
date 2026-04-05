@@ -24,6 +24,12 @@ Claude 使用分析系统 - 帮助团队自动采集、分析使用数据，持�
 | 📊 **Analyst (分析师)** | 分析数据，生成洞察报告 | 请求分析 |
 | 🎯 **Coach (教练)** | 基于数据提供改进建议 | 寻求建议 |
 
+**✨ v2.2.0 新特性：会话继续时恢复追踪状态**
+- 新增 SessionStart Hook，在会话继续时自动恢复问题追踪
+- 从 summary 中识别未解决的问题并恢复到 tracking_state.json
+- 形成完整的使用轨迹，即使会话中断/继续也能连贯记录
+- 自动触发 usage-observer 记录问题状态，供 /usage-coach 分析
+
 **✨ v2.1.0 新特性：Hook 强制触发 Skills**
 - Hook 通过 additionalContext 强制调用 skills
 - 检测问题关键词自动调用 usage-observer

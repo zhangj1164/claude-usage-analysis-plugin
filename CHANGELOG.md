@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-04-05
+
+### Added
+- **SessionStart Hook**: 新增 `hooks/session_resumer.py`，在会话继续时自动恢复问题追踪状态
+  - 从 summary 中识别未解决的问题
+  - 恢复到 `tracking_state.json`
+  - 形成完整的使用轨迹，即使会话中断/继续也能连贯记录
+- **会话继续支持**: 解决从 summary 继续会话时 usage-observer 未触发的问题
+  - 自动触发 usage-observer 记录问题当前状态
+  - 供后续 `/usage-coach` 分析使用轨迹
+
+### Changed
+- **marketplace.json**: 添加 SessionStart Hook 配置
+- **usage-observer SKILL.md**: 更新说明现在由 UserPromptSubmit 和 SessionStart 两个 Hook 触发
+- **usage-observer version**: v4.0.0 → v4.1.0
+
+### Technical Details
+- `session_resumer.py` 分析 summary 内容，识别包含问题关键词但未检测到解决信号的段落
+- 恢复的问题会标记 `restored_from_summary: true` 字段
+- 避免重复追踪：检查问题描述是否已存在于 active_problems
+
 ## [2.1.0] - 2026-03-30
 
 ### Changed

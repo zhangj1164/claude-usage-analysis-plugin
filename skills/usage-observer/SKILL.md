@@ -1,8 +1,8 @@
 ---
 name: usage-observer
-description: 当用户在 Claude Code 会话中提到错误、失败、问题、报错、error、exception、bug、不对、错了、有问题等关键词时自动触发。此 skill 由 UserPromptSubmit hook 自动调用，无需用户手动触发。
+description: 当用户在 Claude Code 会话中提到错误、失败、问题、报错、error、exception、bug、不对、错了、有问题等关键词时自动触发。此 skill 由 UserPromptSubmit hook 和 SessionStart hook 自动调用，无需用户手动触发。
 metadata:
-  version: "4.0.0"
+  version: "4.1.0"
   author: "Claude"
   role: "observer"
   system: "claude-usage-analytics"
@@ -13,13 +13,13 @@ metadata:
 
 ## Overview
 
-本 Skill 是 **usage-analytics 自动追踪系统**的核心组件。当 UserPromptSubmit hook (keyword_router.py) 检测到问题关键词时，会通过 additionalContext 自动触发本 skill。
+本 Skill 是 **usage-analytics 自动追踪系统**的核心组件。当 Hook 检测到问题关键词或会话继续时，会通过 additionalContext 自动触发本 skill。
 
 **自动触发流程：**
 ```
-用户输入包含问题关键词
+用户输入包含问题关键词 OR 会话从 summary 继续
     ↓
-UserPromptSubmit Hook (keyword_router.py)
+UserPromptSubmit Hook (keyword_router.py) OR SessionStart Hook (session_resumer.py)
     ├─ 创建 tracking_state.json 追踪记录
     └─ additionalContext 强制调用本 skill
     ↓
@@ -31,10 +31,9 @@ Stop Hook (stop_recorder.py)
     └─ Claude 回复完成后自动记录到日期 md 文件
 ```
 
-**职责分工：**
-- **keyword_router.py**: 检测关键词，创建追踪记录，触发本 skill
-- **usage-observer (本 skill)**: 观察问题上下文，静默完成
-- **stop_recorder.py**: 自动记录到日期文件
+**触发 Hook：**
+- **UserPromptSubmit**: 检测用户输入中的问题关键词
+- **SessionStart**: 会话继续时从 summary 恢复未解决的问题
 
 ---
 

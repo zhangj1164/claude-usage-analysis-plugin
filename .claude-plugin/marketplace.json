@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Claude Code 使用分析系统 - 帮助团队自动采集、分析使用数据，持续优化 Claude Code 使用体验的完整解决方案",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "tags": [
       "analytics",
       "productivity",
@@ -32,6 +32,13 @@
     }
   ],
   "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session_resumer.py\" 2>/dev/null || python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session_resumer.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/session_resumer.py\"",
+        "description": "会话继续时恢复问题追踪状态，从 summary 中识别未解决的问题并恢复到 tracking_state.json"
+      }
+    ],
     "UserPromptSubmit": [
       {
         "type": "command",
