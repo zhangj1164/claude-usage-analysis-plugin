@@ -299,27 +299,88 @@ def generate_report(memories, usage_data, days=7):
 ### 使用模式分析
 """
 
-    if stats['avg_time'] > 30:
-        report += "- ⚠️ 平均解决时间较长，可能需要提升工具使用效率\n"
-    elif stats['avg_time'] < 15:
-        report += "- ✅ 解决效率较高，工具使用熟练\n"
+    # 解决效率分析
+    if stats['avg_time'] == 0:
+        report += "- ℹ️ 暂无足够的耗时数据进行效率分析\n"
+    elif stats['avg_time'] > 30:
+        report += "- ⚠️ 平均解决时间较长（{:.1f}分钟），可能需要提升工具使用效率\n".format(stats['avg_time'])
+    elif stats['avg_time'] > 20:
+        report += "- 👍 解决效率良好（{:.1f}分钟），继续保持\n".format(stats['avg_time'])
+    else:
+        report += "- ✅ 解决效率优秀（{:.1f}分钟），工具使用熟练\n".format(stats['avg_time'])
 
-    if stats['resolved_rate'] < 80:
-        report += "- ⚠️ 解决率有提升空间，建议建立问题排查清单\n"
-    elif stats['resolved_rate'] > 95:
-        report += "- ✅ 解决率优秀，保持良好习惯\n"
+    # 解决率分析
+    if stats['total_records'] == 0:
+        report += "- ℹ️ 暂无使用记录数据，建议开始记录问题以获取分析\n"
+    elif stats['resolved_rate'] < 60:
+        report += "- ⚠️ 解决率较低（{:.0f}%），建议：\n".format(stats['resolved_rate'])
+        report += "  - 建立问题排查清单，按步骤逐一验证\n"
+        report += "  - 遇到问题先缩小范围再深入分析\n"
+        report += "  - 记录未解决问题的上下文，便于后续追踪\n"
+    elif stats['resolved_rate'] < 80:
+        report += "- 👍 解决率良好（{:.0f}%），有进一步提升空间：\n".format(stats['resolved_rate'])
+        report += "  - 整理常见问题速查表\n"
+        report += "  - 建立个人问题排查清单\n"
+        report += "  - 善用 Claude 的分步调试能力\n"
+    elif stats['resolved_rate'] >= 80:
+        report += "- ✅ 解决率优秀（{:.0f}%），保持良好习惯\n".format(stats['resolved_rate'])
+
+    # 记忆文件分析建议
+    if memory_stats['total'] > 0:
+        report += "- 📁 已建立 {} 条记忆文件，知识沉淀良好\n".format(memory_stats['total'])
+        if memory_stats['by_type'].get('feedback', 0) > 0:
+            report += "- 💬 记录了工作方式偏好，有助于提升协作效率\n"
+        if memory_stats['by_type'].get('project', 0) > 0:
+            report += "- 📋 记录了项目上下文，便于追踪开发历程\n"
+    else:
+        report += "- 💡 建议开始记录记忆文件，沉淀知识和经验\n"
 
     # 高频问题建议
-    if sorted_types and sorted_types[0][0] == '工具错误':
-        report += "\n### 工具错误改进建议\n"
-        report += "1. 整理常用命令速查表\n"
-        report += "2. 复杂操作前先在小范围测试\n"
-        report += "3. 参考文档确认参数用法\n"
+    if sorted_types:
+        report += "\n### 针对性改进建议\n"
+        top_type = sorted_types[0][0]
+        type_suggestions = {
+            '工具错误': [
+                "整理常用命令速查表（Bash/Glob/Grep 等）",
+                "复杂操作前先在小范围测试",
+                "参考文档确认参数用法",
+                "使用 Skill 封装常用操作"
+            ],
+            '执行失败': [
+                "建立问题排查清单（环境→依赖→配置→代码）",
+                "使用分而治之策略缩小问题范围",
+                "记录错误信息和复现步骤",
+                "善用断点和日志定位问题"
+            ],
+            '理解偏差': [
+                "提问时提供更多上下文信息",
+                "复杂需求先拆解为小步骤",
+                "确认理解后再执行操作",
+                "使用反馈循环验证结果"
+            ],
+            '性能问题': [
+                "先定位瓶颈再优化",
+                "使用性能分析工具",
+                "考虑算法复杂度",
+                "优化数据结构选择"
+            ],
+            '其他': [
+                "记录问题类型和解决方案",
+                "建立个人知识库",
+                "定期回顾和总结"
+            ]
+        }
+        suggestions = type_suggestions.get(top_type, type_suggestions['其他'])
+        report += f"针对高频问题类型「{top_type}」（{sorted_types[0][1]}次）：\n"
+        for i, s in enumerate(suggestions, 1):
+            report += f"{i}. {s}\n"
 
     report += "\n### 知识沉淀建议\n"
     report += "建议将以下内容整理为文档:\n"
     report += "- 最近解决的关键问题及方案\n"
     report += "- 常用工具和命令的最佳实践\n"
+    if project_memories:
+        report += "- 项目开发历程和经验总结\n"
 
     return report
 
