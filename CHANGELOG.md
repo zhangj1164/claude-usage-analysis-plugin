@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-04-05 (Pending)
+
+### Added
+- **usage-memory-analyzer**: 新增记忆文件分析 skill
+  - 提取 `~/.claude/projects/*/memory/*.md` 文件内容
+  - 结合 usage-analytics 使用数据生成总结报告
+  - 支持按类型、项目分类统计
+  - 生成洞察与改进建议
+
+### Changed
+- **marketplace.json**: 添加 usage-memory-analyzer 到 skills 列表
+
 ## [2.2.0] - 2026-04-05
 
 ### Added
