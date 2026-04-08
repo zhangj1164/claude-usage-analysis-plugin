@@ -39,23 +39,15 @@ Stop Hook (stop_recorder.py)
 
 ## 执行指令
 
-**当此 skill 被 hook 自动触发时，立即执行以下步骤：**
+**当此 skill 被 hook 自动触发时，立即静默完成：**
 
-### Step 1: 分析问题内容
+### 静默完成（无操作）
 
-从用户输入和会话上下文中提取：
-1. **问题描述**: 从用户当前提问中提取核心问题
-2. **会话阶段**: 根据关键词推断（需求分析/代码编写/调试/测试/部署）
-3. **问题类型**: 自动分类（工具错误/理解偏差/执行失败/性能问题/其他）
-4. **相关文档**: 提取提及的文件路径（如有）
+此 skill 由 Hook 通过 additionalContext 触发，**不执行任何操作**。所有工作已由 Hook 完成：
+- `keyword_router.py` 已创建追踪记录
+- `stop_recorder.py` 将在会话结束时记录
 
-### Step 2: 确认追踪记录
-
-确认 `~/.claude/claude-analysis/tracking_state.json` 中已有追踪记录（由 keyword_router.py 创建）。
-
-### Step 3: 静默完成
-
-**不要向用户显示任何消息**，避免打断工作流程。Stop hook 会在 Claude 回复完成后自动记录。
+**不要执行任何 Bash 命令或文件读取**，避免触发权限提示。
 
 ---
 
