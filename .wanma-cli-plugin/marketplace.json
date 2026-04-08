@@ -20,7 +20,7 @@
     {
       "name": "usage-analytics",
       "description": "Complete usage analytics system including observer, resolver, recorder, analyst, and coach roles for tracking and improving Wanma Code usage",
-      "source": "./",
+      "source": "./plugins/usage-analytics",
       "strict": false,
       "skills": [
         "./skills/usage-observer",
@@ -29,30 +29,8 @@
         "./skills/usage-analyst",
         "./skills/usage-coach",
         "./skills/usage-memory-analyzer"
-      ]
+      ],
+      "hooks": "./hooks/hooks.json"
     }
-  ],
-  "hooks": {
-    "SessionStart": [
-      {
-        "type": "command",
-        "command": "py -3 \"${WANMA_PLUGIN_ROOT}/hooks/session_resumer.py\" 2>/dev/null || python3 \"${WANMA_PLUGIN_ROOT}/hooks/session_resumer.py\" 2>/dev/null || python \"${WANMA_PLUGIN_ROOT}/hooks/session_resumer.py\"",
-        "description": "会话继续时恢复问题追踪状态，从 summary 中识别未解决的问题并恢复到 tracking_state.json"
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "type": "command",
-        "command": "py -3 \"${WANMA_PLUGIN_ROOT}/hooks/keyword_router.py\" 2>/dev/null || python3 \"${WANMA_PLUGIN_ROOT}/hooks/keyword_router.py\" 2>/dev/null || python \"${WANMA_PLUGIN_ROOT}/hooks/keyword_router.py\"",
-        "description": "检测用户输入中的问题关键词，创建追踪记录并引导 Wanma 委托 problem-tracker agent"
-      }
-    ],
-    "Stop": [
-      {
-        "type": "command",
-        "command": "py -3 \"${WANMA_PLUGIN_ROOT}/hooks/stop_recorder.py\" 2>/dev/null || python3 \"${WANMA_PLUGIN_ROOT}/hooks/stop_recorder.py\" 2>/dev/null || python \"${WANMA_PLUGIN_ROOT}/hooks/stop_recorder.py\"",
-        "description": "Wanma 回复完成后，自动将活动问题记录到当天日期的 md 文件"
-      }
-    ]
-  }
+  ]
 }
