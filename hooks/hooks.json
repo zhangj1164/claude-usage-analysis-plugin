@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "错误|失败|问题|报错|不对|错了|有问题|超时|无法|不能|异常|崩溃|卡住|慢|error|exception|bug|failed|fail|wrong|issue|crash|timeout|broken|not working|doesn't work|isn't working",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\" 2>/dev/null || python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\"",
+            "description": "检测用户输入中的问题关键词，创建追踪记录并自动触发 usage-observer skill"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\" 2>/dev/null || python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\"",
+            "description": "Claude 回复完成后，自动将活动问题记录到当天日期的 md 文件"
+          }
+        ]
+      }
+    ]
+  }
+}
