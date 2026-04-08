@@ -29,8 +29,7 @@
         "./skills/usage-analyst",
         "./skills/usage-coach",
         "./skills/usage-memory-analyzer"
-      ],
-      "hooks": "./hooks/hooks.json"
+      ]
     }
   ]
 }
