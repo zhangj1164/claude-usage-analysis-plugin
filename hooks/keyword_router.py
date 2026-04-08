@@ -13,8 +13,13 @@ Keyword Router - UserPromptSubmit Hook
 import json
 import sys
 import os
+import io
 from datetime import datetime
 from pathlib import Path
+
+# Windows 下强制 stdout 使用 UTF-8 编码，避免中文乱码
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 PROBLEM_KEYWORDS = [
     # 执行错误类
