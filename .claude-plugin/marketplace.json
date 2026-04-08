@@ -20,7 +20,7 @@
     {
       "name": "usage-analytics",
       "description": "Complete usage analytics system including observer, resolver, recorder, analyst, and coach roles for tracking and improving Claude Code usage",
-      "source": "./plugins/usage-analytics",
+      "source": "./",
       "strict": false,
       "skills": [
         "./skills/usage-observer",
@@ -31,5 +31,21 @@
         "./skills/usage-memory-analyzer"
       ]
     }
-  ]
+  ],
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "type": "command",
+        "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\" 2>/dev/null || python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\"",
+        "description": "检测用户输入中的问题关键词，创建追踪记录并自动触发 usage-observer skill"
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\" 2>/dev/null || python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\"",
+        "description": "Claude 回复完成后，自动将活动问题记录到当天日期的 md 文件"
+      }
+    ]
+  }
 }
