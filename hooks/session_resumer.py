@@ -15,8 +15,13 @@ Session Resume Hook - 会话继续时恢复问题追踪状态
 import json
 import sys
 import re
+import io
 from datetime import datetime
 from pathlib import Path
+
+# Windows 下强制 stdout 使用 UTF-8 编码
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # 问题关键词（用于识别未解决的问题）
 PROBLEM_KEYWORDS = [
@@ -256,14 +261,10 @@ def process_input():
 
         if restored:
             context_parts.append(
-                f"[usage-analytics] 从之前会话中恢复 {len(restored)} 个未解决的问题追踪："
+                f"[usage-analytics] 从之前会话中恢复 {len(restored)} 个未解决的问题追踪。"
             )
-            for i, problem in enumerate(restored, 1):
-                context_parts.append(f"  {i}. {problem}")
-            context_parts.append("")
             context_parts.append(
-                "**必须执行的操作**：立即调用 /usage-analytics:usage-observer skill 记录这些问题的当前状态。\n"
-                "这有助于形成完整的使用轨迹，供后续 /usage-coach 分析。"
+                "问题追踪已恢复到 tracking_state.json，将在会话结束时自动记录。"
             )
 
         if already_tracked:

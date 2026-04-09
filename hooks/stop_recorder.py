@@ -19,8 +19,13 @@ import json
 import sys
 import os
 import re
+import io
 from datetime import datetime
 from pathlib import Path
+
+# Windows 下强制 stdout 使用 UTF-8 编码
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 RESOLUTION_SIGNALS = [
     "好了", "解决了", "成功了", "可以了", "没问题了",
