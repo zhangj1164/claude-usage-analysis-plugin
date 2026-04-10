@@ -24,11 +24,17 @@ Claude 使用分析系统 - 帮助团队自动采集、分析使用数据，持�
 | 📊 **Analyst (分析师)** | 分析数据，生成洞察报告 | 请求分析 |
 | 🎯 **Coach (教练)** | 基于数据提供改进建议 | 寻求建议 |
 
+**✨ v2.3.0 新特性：SessionStart 和 SessionEnd Hooks**
+- 新增 SessionStart hook（matcher: resume|compact）：会话继续时恢复问题追踪
+- 新增 SessionEnd hook（matcher: resume|clear）：会话结束时自动记录问题
+- 修复 hooks.json 格式（移除 UserPromptSubmit 的 matcher）
+- 所有 hook 脚本强制 UTF-8 编码，修复 Windows 下中文乱码
+- 完整的生命周期追踪：从会话开始到结束
+
 **✨ v2.2.0 新特性：会话继续时恢复追踪状态**
-- 新增 SessionStart Hook，在会话继续时自动恢复问题追踪
-- 从 summary 中识别未解决的问题并恢复到 tracking_state.json
+- SessionStart hook 从 summary 中识别未解决的问题
+- 自动恢复到 tracking_state.json 继续追踪
 - 形成完整的使用轨迹，即使会话中断/继续也能连贯记录
-- 自动触发 usage-observer 记录问题状态，供 /usage-coach 分析
 
 **✨ v2.1.0 新特性：Hook 强制触发 Skills**
 - Hook 通过 additionalContext 强制调用 skills
@@ -80,22 +86,49 @@ claude plugin install usage-analytics
 
 ### ⚙️ 配置
 
-插件安装后会自动配置 Hook，无需手动设置。
+插件安装后会自动配置 Hooks，无需手动设置。
+
+**完整的 Hooks 架构：**
+
+| Hook 事件 | Matcher | 执行脚本 | 功能 |
+|----------|---------|---------|------|
+| SessionStart | `resume\|compact` | session_resumer.py | 会话继续时恢复问题追踪 |
+| UserPromptSubmit | 无条件 | keyword_router.py | 检测问题关键词，创建追踪 |
+| Stop | 无条件 | stop_recorder.py | Claude 回复后自动记录 |
+| SessionEnd | `resume\|clear` | session_ender.py | 会话结束时记录并清空 |
 
 **Hook 工作流程：**
 
 ```
+会话开始/继续 (/resume, /compact)
+    ↓
+SessionStart Hook 触发
+    ↓
+从 summary 恢复未解决的问题 → 更新 tracking_state.json
+    ↓
 用户输入: "运行报错了"
     ↓
 UserPromptSubmit Hook 触发
     ↓
-检测问题关键词 → usage-observer 创建追踪记录（后台静默执行）
+检测问题关键词 → 创建追踪记录（后台静默执行）
     ↓
-... 用户解决问题 ...
+... Claude 回复，用户解决问题 ...
+    ↓
+Stop Hook 触发
+    ↓
+自动记录到日期 md 文件
     ↓
 用户输入: "好了，解决了"
     ↓
-检测解决信号 → usage-resolver 计算耗时并存储（后台静默执行）
+UserPromptSubmit Hook 触发
+    ↓
+检测解决信号 → 标记问题为 resolved
+    ↓
+会话结束 (/clear, /resume)
+    ↓
+SessionEnd Hook 触发
+    ↓
+记录所有活动问题 → 清空问题列表
 ```
 
 **自动检测关键词：**
@@ -147,24 +180,36 @@ UserPromptSubmit Hook 触发
 
 ### 🚀 使用示例
 
-#### 场景 1: 自动问题追踪（v1.1.0 新特性）
+#### 场景 1: 完整的问题追踪生命周期（v2.3.0）
 
 ```
+会话继续 (/compact)
+    ↓
+[SessionStart Hook 触发]
+    ↓
+从之前会话恢复未解决的问题
+    ↓
 用户: "运行测试报错了，提示找不到模块"
       ↓
-[Hook 自动触发 usage-observer]
+[UserPromptSubmit Hook 检测问题关键词]
       ↓
-[后台创建追踪记录，记录开始时间]
+[创建追踪记录，记录开始时间]
       ↓
 ... 用户与 Claude 交互解决问题 ...
       ↓
+[Stop Hook 触发，自动记录]
+      ↓
 用户: "好了，解决了"
       ↓
-[Hook 自动触发 usage-resolver]
+[UserPromptSubmit Hook 检测解决信号]
       ↓
-[自动计算耗时，完成数据存储]
+[标记问题为 resolved，计算耗时]
       ↓
-Claude: (继续正常对话，不打扰用户)
+会话结束 (/clear)
+      ↓
+[SessionEnd Hook 触发]
+      ↓
+[记录所有活动问题到日期 md 文件]
 ```
 
 **查看自动记录的数据：**
@@ -396,6 +441,10 @@ Resolution signal detected → usage-resolver calculates time and stores
 
 ### 📈 Version History
 
+- **v2.3.0** - SessionStart 和 SessionEnd hooks，完整生命周期追踪
+- **v2.2.0** - 会话继续时恢复问题追踪
+- **v2.1.0** - Hook 强制触发 skills，完全后台运行
+- **v2.0.0** - SubAgent 架构重构
 - **v1.1.0** - Automatic problem tracking system
 - **v1.0.2** - Windows compatibility fix
 - **v1.0.1** - Hook API format fix
