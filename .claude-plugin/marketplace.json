@@ -21,15 +21,7 @@
       "name": "usage-analytics",
       "description": "Complete usage analytics system including observer, resolver, recorder, analyst, and coach roles for tracking and improving Claude Code usage",
       "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/usage-observer",
-        "./skills/usage-resolver",
-        "./skills/usage-recorder",
-        "./skills/usage-analyst",
-        "./skills/usage-coach",
-        "./skills/usage-memory-analyzer"
-      ]
+      "strict": false
     }
   ]
 }

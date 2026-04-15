@@ -1,0 +1,20 @@
+{
+  "name": "usage-analytics",
+  "source": {
+    "source": "git",
+    "url": "https://github.com/company/usage-analytics-plugin.git",
+    "ref": "main"
+  },
+  "description": "Usage analytics for Claude Code - A comprehensive system to track, analyze, and optimize the usage of Claude Code within teams, including observer, resolver, recorder, analyst, and coach roles.",
+  "version": "1.0.0",
+  "author": {
+    "name": "zhangj1164",
+    "email": ""
+  },
+  "homepage": "https://docs.example.com/plugins/usage-analytics",
+  "repository": "https://github.com/company/usage-analytics-plugin",
+  "license": "MIT",
+  "keywords": ["usage", "analytics", "productivity"],
+  "category": "productivity",
+  "strict": false
+}
