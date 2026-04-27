@@ -30,13 +30,15 @@ metadata:
 
 ### Step 1: 验证归档状态
 
-读取 `~/.claude/claude-analysis/tracking_state.json`，检查 `resolved_problems` 列表中是否有本次会话的记录。
+使用 **Read 工具**（非 Bash）读取 `~/.claude/claude-analysis/tracking_state.json`。
+
+检查 `resolved_problems` 中是否存在 `session_id` 匹配当前会话的记录。
 
 **如果文件不存在或列表为空**：不报错，静默完成——hook 可能尚未写入。
 
 ### Step 2: 可选耗时通知
 
-如果 `resolved_problems` 中存在当前问题的记录且 `elapsed_minutes > 10`，可在回复中简短附注：
+如果匹配到记录且 `elapsed_minutes > 10`，可在回复中简短附注：
 
 ```
 （本次问题耗时约 X 分钟，已记录）
