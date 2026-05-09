@@ -46,3 +46,9 @@ temp/
 # Claude specific - user data (keep examples)
 .claude/*.local.*
 !.claude/CLAUDE.md
+
+# Wanma specific - user data (keep examples)
+.wanma-cli/*.local.*
+
+# darwin-skill test data
+skills/*/test-*.json
