@@ -6,15 +6,7 @@
   },
   "metadata": {
     "description": "Wanma Code 使用分析系统 - 帮助团队自动采集、分析使用数据，持续优化 Wanma Code 使用体验的完整解决方案",
-    "version": "2.3.0",
-    "tags": [
-      "analytics",
-      "productivity",
-      "team",
-      "monitoring",
-      "improvement"
-    ],
-    "icon": "./assets/icon.svg"
+    "version": "2.4.0"
   },
   "plugins": [
     {

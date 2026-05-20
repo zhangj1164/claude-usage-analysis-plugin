@@ -2,14 +2,14 @@
   "name": "usage-analytics",
   "source": {
     "source": "git",
-    "url": "https://github.com/company/usage-analytics-plugin.git",
+    "url": "https://github.com/zhangj1164/claude-usage-analysis-plugin.git",
     "ref": "main"
   },
-  "description": "Usage analytics for Claude Code - A comprehensive system to track, analyze, and optimize the usage of Claude Code within teams, including observer, resolver, recorder, analyst, and coach roles.",
+  "description": "Usage analytics for Wanma Code - A comprehensive system to track, analyze, and optimize the usage of Wanma Code within teams, including observer, resolver, recorder, analyst, and coach roles.",
   "version": "2.4.0",
   "author": {
     "name": "zhangj1164",
-    "email": ""
+    "email": "zhangj1164@chinaunicom.cn"
   },
   "homepage": "https://github.com/zhangj1164/claude-usage-analysis-plugin",
   "repository": "https://github.com/zhangj1164/claude-usage-analysis-plugin",
