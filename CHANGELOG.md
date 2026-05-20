@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.3.0] - 2026-04-05 (Pending)
+## [2.4.0] - 2026-05-20
+
+### Added
+- **marketplace.json**: 新增 `homepage` 和 `repository` 字段
+- **.wanma-cli-plugin**: 新增 `plugin.json`，支持 Wanma Code 插件体系
+
+### Changed
+- **marketplace.json**: 移除未识别的 `tags` 和 `icon` 字段，清理验证警告
+- **.wanma-cli-plugin/marketplace.json**: 同步移除 `tags` 和 `icon`，新增 `homepage` 和 `repository`
+
+## [2.3.0] - 2026-04-05
 
 ### Added
 - **usage-memory-analyzer**: 新增记忆文件分析 skill
@@ -173,7 +183,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - System architecture documentation
 - Usage examples and workflows
 
-[Unreleased]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v2.3.0...v2.4.0
+[2.3.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v2.2.0...v2.3.0
+[2.2.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/zhangj1164/claude-usage-analysis-plugin/releases/tag/v1.1.0

@@ -24,6 +24,11 @@ Claude 使用分析系统 - 帮助团队自动采集、分析使用数据，持�
 | 📊 **Analyst (分析师)** | 分析数据，生成洞察报告 | 请求分析 |
 | 🎯 **Coach (教练)** | 基于数据提供改进建议 | 寻求建议 |
 
+**✨ v2.4.0 新特性：Manifest 规范化与 Wanma Code 支持**
+- marketplace.json 新增 `homepage` 和 `repository` 字段
+- 移除未识别的 `tags` 和 `icon` 字段，消除验证警告
+- 新增 `.wanma-cli-plugin/plugin.json`，支持 Wanma Code 插件体系
+
 **✨ v2.3.0 新特性：SessionStart 和 SessionEnd Hooks**
 - 新增 SessionStart hook（matcher: resume|compact）：会话继续时恢复问题追踪
 - 新增 SessionEnd hook（matcher: resume|clear）：会话结束时自动记录问题
@@ -180,7 +185,7 @@ SessionEnd Hook 触发
 
 ### 🚀 使用示例
 
-#### 场景 1: 完整的问题追踪生命周期（v2.3.0）
+#### 场景 1: 完整的问题追踪生命周期
 
 ```
 会话继续 (/compact)
@@ -441,6 +446,7 @@ Resolution signal detected → usage-resolver calculates time and stores
 
 ### 📈 Version History
 
+- **v2.4.0** - Manifest 规范化，新增 homepage/repository，Wanma Code 支持
 - **v2.3.0** - SessionStart 和 SessionEnd hooks，完整生命周期追踪
 - **v2.2.0** - 会话继续时恢复问题追踪
 - **v2.1.0** - Hook 强制触发 skills，完全后台运行
