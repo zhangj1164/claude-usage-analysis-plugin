@@ -1,0 +1,9 @@
+timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
+2026-04-27T14:45	054b0e7	usage-resolver	49.5	75.0	keep	架构+指令	去重+独立职责+边界条件	dry_run
+2026-04-27T14:50	798a521	usage-resolver	75.0	77.0	keep	指令具体性	Step1增加Read工具+session_id	dry_run
+2026-04-27T14:55	e263488	usage-recorder	56.5	69.2	keep	边界条件+指令	解决矛盾+去重+边界条件	dry_run
+2026-04-27T14:57	f6eac2f	usage-recorder	69.2	69.7	keep	边界条件	Step1增加active_problems场景	dry_run
+2026-04-27T15:00	93f99ae	usage-observer	56.5	69.7	keep	架构+边界	解决矛盾+边界条件+分类归属	dry_run
+2026-04-27T15:05	a0ad7c8	usage-memory-analyzer	57.1	73.7	keep	边界+资源	去脚本引用+边界条件+精简	dry_run
+2026-04-27T15:10	2418400	usage-coach	61.1	75.2	keep	边界+资源+指令	精简+边界条件+Read工具	dry_run
+2026-04-27T15:15	2b744b5	usage-analyst	63.8	76.7	keep	边界+指令	精简+边界条件+明确读取路径	dry_run

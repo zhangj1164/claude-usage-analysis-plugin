@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session_resumer.py\" 2>/dev/null || python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session_resumer.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/session_resumer.py\"",
+            "command": "bash -c 'R=\"${CHATCODE_PLUGIN_ROOT}\"; [ -z \"$R\" ] && R=\"${CLAUDE_PLUGIN_ROOT}\"; [ -z \"$R\" ] && R=\"${WANMA_PLUGIN_ROOT}\"; [ -z \"$R\" ] && { echo \"usage-analytics: no *_PLUGIN_ROOT env var found\" >&2; exit 1; }; exec python \"$R/hooks/session_resumer.py\"'",
             "description": "会话继续时，记录今天未解决的问题或继续跟踪"
           }
         ]
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\" 2>/dev/null || python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/keyword_router.py\"",
+            "command": "bash -c 'R=\"${CHATCODE_PLUGIN_ROOT}\"; [ -z \"$R\" ] && R=\"${CLAUDE_PLUGIN_ROOT}\"; [ -z \"$R\" ] && R=\"${WANMA_PLUGIN_ROOT}\"; [ -z \"$R\" ] && { echo \"usage-analytics: no *_PLUGIN_ROOT env var found\" >&2; exit 1; }; exec python \"$R/hooks/keyword_router.py\"'",
             "description": "检测用户输入中的问题关键词，创建追踪记录并自动触发 usage-observer skill"
           }
         ]
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\" 2>/dev/null || python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/stop_recorder.py\"",
+            "command": "bash -c 'R=\"${CHATCODE_PLUGIN_ROOT}\"; [ -z \"$R\" ] && R=\"${CLAUDE_PLUGIN_ROOT}\"; [ -z \"$R\" ] && R=\"${WANMA_PLUGIN_ROOT}\"; [ -z \"$R\" ] && { echo \"usage-analytics: no *_PLUGIN_ROOT env var found\" >&2; exit 1; }; exec python \"$R/hooks/stop_recorder.py\"'",
             "description": "Claude 回复完成后，自动将活动问题记录到当天日期的 md 文件"
           }
         ]
@@ -40,11 +40,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "py -3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session_ender.py\" 2>/dev/null || python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session_ender.py\" 2>/dev/null || python \"${CLAUDE_PLUGIN_ROOT}/hooks/session_ender.py\"",
+            "command": "bash -c 'R=\"${CHATCODE_PLUGIN_ROOT}\"; [ -z \"$R\" ] && R=\"${CLAUDE_PLUGIN_ROOT}\"; [ -z \"$R\" ] && R=\"${WANMA_PLUGIN_ROOT}\"; [ -z \"$R\" ] && { echo \"usage-analytics: no *_PLUGIN_ROOT env var found\" >&2; exit 1; }; exec python \"$R/hooks/session_ender.py\"'",
             "description": "会话结束时，将活动问题记录到日期 md 文件"
           }
         ]
       }
     ]
-  }
+  },
+  "_comment": "参考配置。各 agent 工具(Claude Code / ChatCode CLI / Wanma CLI)注入的插件根路径变量名不同，这里用 bash 顺序兜底链按优先级 CHATCODE_PLUGIN_ROOT -> CLAUDE_PLUGIN_ROOT -> WANMA_PLUGIN_ROOT 解析，一份配置即可兼容多工具，无需手动替换路径。作为插件安装时由工具自动加载 hooks/hooks.json。"
 }
